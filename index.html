@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Physics Simulation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css"/>
+    <script src="animate.js" defer></script>
+</head>
+
+<body>
+<header>
+    <h1>Simple Physics Simulation (for Chrome)</h1>
+    <p>
+        Adjust the amount of simulated objects with the slider and press Start.<br/>
+        Elements can also be added by moving the mouse in the canvas,<br/>
+        press and release the left mouse button to spawn a new element.<br/>
+    </p>
+</header>
+
+<nav>
+    <label for="myRange">Amount of simulated Objects</label><br/>
+    <input type="range" min="1" max="24" id="myRange" value="12">
+    <button id="start">Start</button>
+</nav>
+
+<canvas id="myCanvas" width="600" height="600">
+    Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+</body>
+</html>
