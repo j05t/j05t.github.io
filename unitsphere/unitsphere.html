@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit Sphere</title>
+    <link rel="stylesheet" src="js/dat.gui.css">
+    <style>
+        #info {
+            position: absolute;
+            bottom: 16px;
+            left: 32px;
+            text-align: left;
+            z-index: 100;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<script src="js/three.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/dat.gui.js"></script>
+
+<div id="info">Coordinates</div>
+
+<script>
+    infoDiv = document.getElementById("info");
+
+    effectController = {
+        azimuth: 0,
+        altitude: 45,
+        wireframe: true,
+        orthographic: false
+    };
+    var gui = new dat.GUI();
+    gui.add(effectController, "azimuth", 0.0, 360.0).name("Azimuth");
+    gui.add(effectController, "altitude", -90.0, 90.0).name("Altitude");
+    var onWireframeChangeController = gui.add(effectController, "wireframe").name("Wireframe");
+    var onChangeCamera = gui.add(effectController, "orthographic").name("Orthographic");
+
+    onWireframeChangeController.onChange(function (value) {
+        sphere.material.wireframe = value;
+    });
+
+    onChangeCamera.onChange(function (value) {
+        if (value) {
+            camera = orthographicCamera;
+            camera.position.set(0, 0, 1);
+        } else {
+            camera = perspectiveCamera;
+            camera.position.set(1, 1, 2);
+        }
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+    });
+
+    var scene = new THREE.Scene();
+    var camera;
+    var perspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10);
+    var orthographicCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0, 2);
+    orthographicCamera.position.set(0, 0, 1);
+    perspectiveCamera.position.set(1, 1, 2);
+    camera = perspectiveCamera;
+
+    var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    var axesHelper = new THREE.AxesHelper(10);
+    scene.add(axesHelper);
+
+    var grid = new THREE.GridHelper(10, 10);
+    grid.material.transparent = true;
+    grid.material.opacity = 0.5;
+    scene.add(grid);
+
+    var polarGridHelper = new THREE.PolarGridHelper(200, 16, 8, 64, 0x0000ff, 0x808080);
+    polarGridHelper.rotation.x = Math.PI / 2;
+    polarGridHelper.material.transparent = true;
+    polarGridHelper.material.opacity = 0.25;
+    scene.add(polarGridHelper);
+
+    // unit sphere
+    var sphereMaterial = new THREE.MeshDepthMaterial({transparent: true, opacity: 0.16, wireframe: true});
+    var sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(sphere);
+
+    // point indicating position on unit sphere
+    var pointMaterial = new THREE.MeshBasicMaterial({color: 0xcc0000});
+    var pointGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+    var point = new THREE.Mesh(pointGeometry, pointMaterial);
+    scene.add(point);
+
+    // XY triangle
+    var triangleMaterial = new THREE.MeshLambertMaterial({
+        color: 0xcc0000, emissive: 0xaa0000,
+        emissiveIntensity: 1.42, transparent: true, opacity: 0.6, side: THREE.DoubleSide
+    });
+    var triangleGeometry = new THREE.Geometry();
+    triangleGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    triangleGeometry.vertices.push(new THREE.Vector3(1, 0, 0));
+    triangleGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
+    var triangle = new THREE.Mesh(triangleGeometry, triangleMaterial);
+    scene.add(triangle);
+
+    // lines from point to x, y, z axis
+    var lineMaterial = new THREE.LineDashedMaterial({
+        color: 0x00ff00,
+        linewidth: 2,
+        scale: 1,
+        dashSize: 3,
+        gapSize: 2,
+    });
+    var xLineGeometry = new THREE.Geometry();
+    xLineGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    xLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 1, 0));
+    var xLine = new THREE.Line(xLineGeometry, lineMaterial);
+    scene.add(xLine);
+
+    var yLineGeometry = new THREE.Geometry();
+    yLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 1, 0));
+    yLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 0, 0));
+    var yLine = new THREE.Line(yLineGeometry, lineMaterial);
+    scene.add(yLine);
+
+    var zLineGeometry = new THREE.Geometry();
+    zLineGeometry.vertices.push(new THREE.Vector3(point.position.x, point.position.y, 0));
+    zLineGeometry.vertices.push(new THREE.Vector3(point.position.x, point.position.y, point.position.z));
+    var zLine = new THREE.Line(zLineGeometry, lineMaterial);
+    scene.add(zLine);
+
+    function updateTriangle() {
+        triangle.geometry.vertices[0].set(point.position.x, 0, 0);
+        triangle.geometry.vertices[1].set(point.position.x, point.position.y, 0);
+        triangle.geometry.verticesNeedUpdate = true;
+
+        xLine.geometry.vertices[1].set(point.position.x, point.position.y, 0);
+        xLine.geometry.vertices[0].set(0, point.position.y, 0);
+        xLine.geometry.verticesNeedUpdate = true;
+
+        yLine.geometry.vertices[1].set(point.position.x, 0, 0);
+        yLine.geometry.vertices[0].set(point.position.x, point.position.y, 0);
+        yLine.geometry.verticesNeedUpdate = true;
+
+        zLine.geometry.vertices[1].set(point.position.x, point.position.y, 0);
+        zLine.geometry.vertices[0].set(point.position.x, point.position.y, point.position.z);
+        zLine.geometry.verticesNeedUpdate = true;
+    }
+
+    var render = function () {
+        requestAnimationFrame(render);
+
+        // altitude
+        point.position.y = Math.sin(effectController.altitude * Math.PI / 180.0);
+        // azimuth
+        var length = Math.sqrt(1 - point.position.y * point.position.y);
+        point.position.x = length * Math.cos(effectController.azimuth * Math.PI / 180.0);
+        point.position.z = length * Math.sin(effectController.azimuth * Math.PI / 180.0);
+
+        var curAltitude = effectController.altitude.toFixed(0);
+        var curAzimuth = effectController.azimuth.toFixed(0);
+        var curX = point.position.x.toFixed(2);
+        var curY = point.position.y.toFixed(2);
+        var curZ = point.position.z.toFixed(2);
+
+        //cos(a)^2 + sin(a)^2 = 1
+
+        infoDiv.innerHTML = "<p>x = cos(" + curAltitude + ") = " + curX + "</p>"
+            + "<p>y = sin(" + curAltitude + ") = " + curY + "</p>"
+            + "<p>z = cos(" + curAzimuth + ") = " + curZ + "</p>"
+            + "<p>x&sup2;  + y&sup2;  + z&sup2;  = " + (curX * curX + curY * curY + curZ * curZ).toFixed(2) + "</p>";
+
+        updateTriangle();
+
+        renderer.render(scene, camera);
+    };
+
+    render();
+
+</script>
+
+</body>
+</html>

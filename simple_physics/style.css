@@ -1,0 +1,15 @@
+nav {
+    margin: 6px;
+    padding: 6px;
+    border: 1px solid black;
+    width: 360px;
+}
+
+#start {
+    float: right;
+    margin-right: 10px;
+}
+
+#myCanvas {
+    border: 1px solid #d3d3d3;
+}
