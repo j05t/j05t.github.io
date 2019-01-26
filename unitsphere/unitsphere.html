@@ -148,6 +148,7 @@
         zLine.geometry.vertices[0].set(direction.x, direction.y, direction.z);
 
         arrowHelper.setDirection(direction);
+
         triangle.geometry.verticesNeedUpdate = true;
         xLine.geometry.verticesNeedUpdate = true;
         yLine.geometry.verticesNeedUpdate = true;
@@ -169,7 +170,7 @@
     onAlitudeChangeController.onChange(updateVertices);
     onAzimuthChangeController.onChange(updateVertices);
 
-    var arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(1, 1, 1), new THREE.Vector3(0, 0, 0), 1, 0xff0000);
+    var arrowHelper = new THREE.ArrowHelper(direction, new THREE.Vector3(0, 0, 0), 1, 0xff0000);
     scene.add(arrowHelper);
 
     var render = function () {
