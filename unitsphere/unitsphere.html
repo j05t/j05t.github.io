@@ -32,14 +32,18 @@
         orthographic: false
     };
     var gui = new dat.GUI();
-    gui.add(effectController, "azimuth", 0.0, 360.0).name("Azimuth");
-    gui.add(effectController, "altitude", -90.0, 90.0).name("Altitude");
+    var onAzimuthChangeController = gui.add(effectController, "azimuth", 0.0, 360.0).name("Azimuth");
+    var onAlitudeChangeController = gui.add(effectController, "altitude", -90.0, 90.0).name("Altitude");
     var onWireframeChangeController = gui.add(effectController, "wireframe").name("Wireframe");
     var onChangeCamera = gui.add(effectController, "orthographic").name("Orthographic");
+
+    // direction of unit vector
+    var direction = new THREE.Vector3();
 
     onWireframeChangeController.onChange(function (value) {
         sphere.material.wireframe = value;
     });
+
 
     onChangeCamera.onChange(function (value) {
         if (value) {
@@ -81,21 +85,15 @@
     scene.add(polarGridHelper);
 
     // unit sphere
-    var sphereMaterial = new THREE.MeshDepthMaterial({transparent: true, opacity: 0.16, wireframe: true});
+    var sphereMaterial = new THREE.MeshLambertMaterial({transparent: true, opacity: 0.16, wireframe: true});
     var sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     scene.add(sphere);
 
-    // point indicating position on unit sphere
-    var pointMaterial = new THREE.MeshBasicMaterial({color: 0xcc0000});
-    var pointGeometry = new THREE.SphereGeometry(0.02, 8, 8);
-    var point = new THREE.Mesh(pointGeometry, pointMaterial);
-    scene.add(point);
-
     // XY triangle
     var triangleMaterial = new THREE.MeshLambertMaterial({
         color: 0xcc0000, emissive: 0xaa0000,
-        emissiveIntensity: 1.42, transparent: true, opacity: 0.6, side: THREE.DoubleSide
+        emissiveIntensity: 1.42, transparent: true, opacity: 0.42, side: THREE.DoubleSide
     });
     var triangleGeometry = new THREE.Geometry();
     triangleGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
@@ -115,67 +113,72 @@
     });
     var xLineGeometry = new THREE.Geometry();
     xLineGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-    xLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 1, 0));
+    xLineGeometry.vertices.push(new THREE.Vector3(direction.x, 1, 0));
     var xLine = new THREE.Line(xLineGeometry, lineMaterial);
     scene.add(xLine);
 
     var yLineGeometry = new THREE.Geometry();
-    yLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 1, 0));
-    yLineGeometry.vertices.push(new THREE.Vector3(point.position.x, 0, 0));
+    yLineGeometry.vertices.push(new THREE.Vector3(direction.x, 1, 0));
+    yLineGeometry.vertices.push(new THREE.Vector3(direction.x, 0, 0));
     var yLine = new THREE.Line(yLineGeometry, lineMaterial);
     scene.add(yLine);
 
     var zLineGeometry = new THREE.Geometry();
-    zLineGeometry.vertices.push(new THREE.Vector3(point.position.x, point.position.y, 0));
-    zLineGeometry.vertices.push(new THREE.Vector3(point.position.x, point.position.y, point.position.z));
+    zLineGeometry.vertices.push(new THREE.Vector3(direction.x, direction.y, 0));
+    zLineGeometry.vertices.push(new THREE.Vector3(direction.x, direction.y, direction.z));
     var zLine = new THREE.Line(zLineGeometry, lineMaterial);
     scene.add(zLine);
 
-    function updateTriangle() {
-        triangle.geometry.vertices[0].set(point.position.x, 0, 0);
-        triangle.geometry.vertices[1].set(point.position.x, point.position.y, 0);
+
+    var updateVertices = function () {
+        direction.x = Math.cos(effectController.altitude * Math.PI / 180.0) * Math.cos(effectController.azimuth * Math.PI / 180.0);
+        direction.y = Math.sin(effectController.altitude * Math.PI / 180.0);
+        direction.z = Math.cos(effectController.altitude * Math.PI / 180.0) * Math.sin(effectController.azimuth * Math.PI / 180.0);
+
+        triangle.geometry.vertices[0].set(direction.x, 0, 0);
+        triangle.geometry.vertices[1].set(direction.x, direction.y, 0);
+
+        xLine.geometry.vertices[1].set(direction.x, direction.y, 0);
+        xLine.geometry.vertices[0].set(0, direction.y, 0);
+
+        yLine.geometry.vertices[1].set(direction.x, 0, 0);
+        yLine.geometry.vertices[0].set(direction.x, direction.y, 0);
+
+        zLine.geometry.vertices[1].set(direction.x, direction.y, 0);
+        zLine.geometry.vertices[0].set(direction.x, direction.y, direction.z);
+
+        arrowHelper.setDirection(direction);
         triangle.geometry.verticesNeedUpdate = true;
-
-        xLine.geometry.vertices[1].set(point.position.x, point.position.y, 0);
-        xLine.geometry.vertices[0].set(0, point.position.y, 0);
         xLine.geometry.verticesNeedUpdate = true;
-
-        yLine.geometry.vertices[1].set(point.position.x, 0, 0);
-        yLine.geometry.vertices[0].set(point.position.x, point.position.y, 0);
         yLine.geometry.verticesNeedUpdate = true;
-
-        zLine.geometry.vertices[1].set(point.position.x, point.position.y, 0);
-        zLine.geometry.vertices[0].set(point.position.x, point.position.y, point.position.z);
         zLine.geometry.verticesNeedUpdate = true;
-    }
+
+        // round angles and coordinates for output
+        var curAltitude = effectController.altitude.toFixed(0);
+        var curAzimuth = effectController.azimuth.toFixed(0);
+        var curX = direction.x.toFixed(2);
+        var curY = direction.y.toFixed(2);
+        var curZ = direction.z.toFixed(2);
+
+        infoDiv.innerHTML = "<pre>x = cos(Altitude)cos(Azimuth) = cos(" + curAltitude + ")cos(" + curAzimuth + ") = " + curX + "\n"
+            + "y = sin(Altitude) = sin(" + curAltitude + ") = " + curY + "\n"
+            + "z = cos(Altitude)sin(Azimuth) = cos(" + curAltitude + ")sin(" + curAzimuth + ") = " + curZ + "\n"
+            + "x&sup2; + y&sup2; + z&sup2; = 1</pre>";
+    };
+
+    onAlitudeChangeController.onChange(updateVertices);
+    onAzimuthChangeController.onChange(updateVertices);
+
+    var arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(1, 1, 1), new THREE.Vector3(0, 0, 0), 1, 0xff0000);
+    scene.add(arrowHelper);
 
     var render = function () {
         requestAnimationFrame(render);
 
-        // altitude
-        point.position.y = Math.sin(effectController.altitude * Math.PI / 180.0);
-        // azimuth
-        var length = Math.sqrt(1 - point.position.y * point.position.y);
-        point.position.x = length * Math.cos(effectController.azimuth * Math.PI / 180.0);
-        point.position.z = length * Math.sin(effectController.azimuth * Math.PI / 180.0);
-
-        var curAltitude = effectController.altitude.toFixed(0);
-        var curAzimuth = effectController.azimuth.toFixed(0);
-        var curX = point.position.x.toFixed(2);
-        var curY = point.position.y.toFixed(2);
-        var curZ = point.position.z.toFixed(2);
-
-        //cos(a)^2 + sin(a)^2 = 1
-
-        infoDiv.innerHTML = "<p>x = cos(" + curAltitude + ") = " + curX + "</p>"
-            + "<p>y = sin(" + curAltitude + ") = " + curY + "</p>"
-            + "<p>z = cos(" + curAzimuth + ") = " + curZ + "</p>"
-            + "<p>x&sup2;  + y&sup2;  + z&sup2;  = " + (curX * curX + curY * curY + curZ * curZ).toFixed(2) + "</p>";
-
-        updateTriangle();
-
         renderer.render(scene, camera);
     };
+
+    updateVertices();
 
     render();
 
