@@ -35,7 +35,7 @@
     var onAzimuthChangeController = gui.add(effectController, "azimuth", 0.0, 360.0).name("Azimuth");
     var onAlitudeChangeController = gui.add(effectController, "altitude", -90.0, 90.0).name("Altitude");
     var onWireframeChangeController = gui.add(effectController, "wireframe").name("Wireframe");
-    var onChangeCamera = gui.add(effectController, "orthographic").name("Orthographic");
+    var onCameraChangeController = gui.add(effectController, "orthographic").name("Orthographic");
 
     // direction of unit vector
     var direction = new THREE.Vector3();
@@ -45,10 +45,12 @@
     });
 
 
-    onChangeCamera.onChange(function (value) {
+    onCameraChangeController.onChange(function (value) {
         if (value) {
             camera = orthographicCamera;
             camera.position.set(0, 0, 1);
+            camera.zoom = 0.42;
+            camera.updateProjectionMatrix();
         } else {
             camera = perspectiveCamera;
             camera.position.set(1, 1, 2);
@@ -56,12 +58,20 @@
         controls = new THREE.OrbitControls(camera, renderer.domElement);
     });
 
+
+    var viewSize = window.innerHeight;
+    var aspectRatio = window.innerWidth / viewSize;
+
     var scene = new THREE.Scene();
     var camera;
     var perspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10);
-    var orthographicCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0, 2);
-    orthographicCamera.position.set(0, 0, 1);
+    var orthographicCamera = new THREE.OrthographicCamera(-aspectRatio / 2,
+        aspectRatio / 2, 1 / 2, -1 / 2, -10, 10);
+
+    orthographicCamera.zoom = 0.42;
+
     perspectiveCamera.position.set(1, 1, 2);
+
     camera = perspectiveCamera;
 
     var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
@@ -165,6 +175,7 @@
             + "y = sin(Altitude) = sin(" + curAltitude + ") = " + curY + "\n"
             + "z = cos(Altitude)sin(Azimuth) = cos(" + curAltitude + ")sin(" + curAzimuth + ") = " + curZ + "\n"
             + "x&sup2; + y&sup2; + z&sup2; = 1</pre>";
+
     };
 
     onAlitudeChangeController.onChange(updateVertices);
@@ -177,6 +188,7 @@
         requestAnimationFrame(render);
 
         renderer.render(scene, camera);
+
     };
 
     updateVertices();
