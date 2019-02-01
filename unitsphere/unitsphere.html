@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Unit Sphere</title>
-    <link rel="stylesheet" src="js/dat.gui.css">
+    <link rel="stylesheet" href="js/dat.gui.css">
     <style>
         #info {
             position: absolute;
@@ -20,7 +20,7 @@
 <script src="js/OrbitControls.js"></script>
 <script src="js/dat.gui.js"></script>
 
-<div id="info">Coordinates</div>
+<div id="info"></div>
 
 <script>
     infoDiv = document.getElementById("info");
@@ -31,19 +31,19 @@
         wireframe: true,
         orthographic: false
     };
+
+    // direction of unit vector
+    var direction = new THREE.Vector3();
+
     var gui = new dat.GUI();
     var onAzimuthChangeController = gui.add(effectController, "azimuth", 0.0, 360.0).name("Azimuth");
     var onAlitudeChangeController = gui.add(effectController, "altitude", -90.0, 90.0).name("Altitude");
     var onWireframeChangeController = gui.add(effectController, "wireframe").name("Wireframe");
     var onCameraChangeController = gui.add(effectController, "orthographic").name("Orthographic");
 
-    // direction of unit vector
-    var direction = new THREE.Vector3();
-
     onWireframeChangeController.onChange(function (value) {
         sphere.material.wireframe = value;
     });
-
 
     onCameraChangeController.onChange(function (value) {
         if (value) {
@@ -65,12 +65,11 @@
     var scene = new THREE.Scene();
     var camera;
     var perspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10);
+    perspectiveCamera.position.set(1, 1, 2);
+
     var orthographicCamera = new THREE.OrthographicCamera(-aspectRatio / 2,
         aspectRatio / 2, 1 / 2, -1 / 2, -10, 10);
-
     orthographicCamera.zoom = 0.42;
-
-    perspectiveCamera.position.set(1, 1, 2);
 
     camera = perspectiveCamera;
 
@@ -93,6 +92,9 @@
     polarGridHelper.material.transparent = true;
     polarGridHelper.material.opacity = 0.25;
     scene.add(polarGridHelper);
+
+    var arrowHelper = new THREE.ArrowHelper(direction, new THREE.Vector3(0, 0, 0), 1, 0xff0000);
+    scene.add(arrowHelper);
 
     // unit sphere
     var sphereMaterial = new THREE.MeshLambertMaterial({transparent: true, opacity: 0.16, wireframe: true});
@@ -164,7 +166,7 @@
         yLine.geometry.verticesNeedUpdate = true;
         zLine.geometry.verticesNeedUpdate = true;
 
-        // round angles and coordinates for output
+        // truncate to 2 decimals for output
         var curAltitude = effectController.altitude.toFixed(0);
         var curAzimuth = effectController.azimuth.toFixed(0);
         var curX = direction.x.toFixed(2);
@@ -180,9 +182,6 @@
 
     onAlitudeChangeController.onChange(updateVertices);
     onAzimuthChangeController.onChange(updateVertices);
-
-    var arrowHelper = new THREE.ArrowHelper(direction, new THREE.Vector3(0, 0, 0), 1, 0xff0000);
-    scene.add(arrowHelper);
 
     var render = function () {
         requestAnimationFrame(render);
