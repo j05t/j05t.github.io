@@ -60,6 +60,10 @@
     var features = svg.append("g")
         .attr("class", "features");
 
+    //Group for the map bubbles
+    var bubbles = svg.append("g")
+        .attr("class", "bubbles");
+
     //Create zoom/pan listener
     //Change [1,Infinity] to adjust the min/max zoom scale
     var zoom = d3.behavior.zoom()
@@ -67,6 +71,9 @@
         .on("zoom", zoomed);
 
     svg.call(zoom);
+
+    var radius = d3.scale.sqrt().domain([0, 2e6]).range([0, 32]);
+
 
     d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
         if (error) return console.log(error); //unknown error, check the console
@@ -79,9 +86,24 @@
             .attr("d", path)
             .attr("fill", d => color(data.get(d.properties.iso)))
             .on("click", clicked)
-            .append("title").text(d => d.properties.name + ": " + data.get(d.properties.iso));
-        //title will only be displayed if it's a child element
+            .append("title").text(d => d.properties.name + ": " + data.get(d.properties.iso))
 
+
+        //Create a circle for each map feature in the data
+        bubbles.selectAll("bubbles")
+            .data(topojson.feature(geodata, geodata.objects.gemeinden).features) //generate features from TopoJSON
+            .enter()
+            .append("circle")
+            .attr("fill", "brown")
+            .attr("fill-opacity", 0.8)
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5)
+            .attr("transform", d => `translate(${path.centroid(d)})`)
+            .attr("r",  d => radius(data.get(d.properties.iso)))
+            .append("title").text(d => d.properties.name + ": " + data.get(d.properties.iso));
+
+
+        // global for inspection in browser
         aut = geodata;
 
         init();
@@ -103,6 +125,8 @@
     //Update map on zoom/pan
     function zoomed() {
         features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
+            .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
+        bubbles.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
             .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
     }
 
