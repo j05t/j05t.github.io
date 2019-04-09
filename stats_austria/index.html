@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Einwohner Österreich nach Gemeinden</title>
+    <style>
+
+        body {
+            font: 12px sans-serif;
+        }
+
+        path {
+            stroke-width: 1px;
+            stroke: white;
+            cursor: pointer;
+        }
+
+        path:hover, path.highlighted {
+            fill: tomato;
+        }
+
+    </style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v2.min.js"></script>
+<script src="js/data.js"></script>
+<script>
+    // template from mapstarter.com
+
+    // global topo data
+    var aut;
+
+    // d3.schemeBlues[9]
+    //         .range(["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"]);
+    var color = d3.scale.log()
+        .domain([200, 200000])
+        .range(["#deebf7", "#08306b", "#08306b"]);
+
+    //Map dimensions (in pixels)
+    var width = window.innerWidth - 20,
+        height = window.innerHeight - 20;
+
+    //Map projection
+    var projection = d3.geo.mercator()
+        .scale(5706.315012582816)
+        .center([13.346443836054394, 47.72342963833456]) //projection center
+        .translate([width / 2, height / 2]) //translate to center the map in view
+
+    //Generate paths based on projection
+    var path = d3.geo.path()
+        .projection(projection);
+
+    //Create an SVG
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    //Group for the map features
+    var features = svg.append("g")
+        .attr("class", "features");
+
+    //Create zoom/pan listener
+    //Change [1,Infinity] to adjust the min/max zoom scale
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([1, Infinity])
+        .on("zoom", zoomed);
+
+    svg.call(zoom);
+
+    d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
+        if (error) return console.log(error); //unknown error, check the console
+
+        //Create a path for each map feature in the data
+        features.selectAll("path")
+            .data(topojson.feature(geodata, geodata.objects.gemeinden).features) //generate features from TopoJSON
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("fill", d => color(data.get(d.properties.iso)))
+            .on("click", clicked)
+            .append("title").text(d => d.properties.name + ": " + data.get(d.properties.iso));
+        //title will only be displayed if it's a child element
+
+        aut = geodata;
+
+        init();
+
+    });
+
+    function init() {
+        // do something
+    }
+
+    // Add optional onClick events for features here
+    // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+    function clicked(d, i) {
+        console.log(d.properties.name, d.properties.iso, data.get(d.properties.iso));
+        //console.log(d);
+    }
+
+
+    //Update map on zoom/pan
+    function zoomed() {
+        features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
+            .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
+    }
+
+</script>
