@@ -177,17 +177,4 @@
 
 </body>
 
-
-<?php if(isset($_POST['message']): ?>
-
-<script>
-    var logo = new Image();
-    logo.src = "<?php $_POST['message'] ?>";
-    head.material.map.image = logo;
-    head.material.needsUpdate = true;
-</script>
-
-<?php endif ?>
-
-
 </html>
