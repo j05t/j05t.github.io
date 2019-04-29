@@ -176,7 +176,11 @@ body {
 }
 
 #engravedBy {
-    font-size: 12px;
+    font-size: 14px;
+}
+
+#engravedBy > img {
+    width: 112px;
 }
 
 .nobr {

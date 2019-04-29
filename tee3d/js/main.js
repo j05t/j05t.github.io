@@ -1,5 +1,4 @@
-// show one out of five random background images
-var backgroundImage = "img/background" + randomIntFromInterval(0, 4) + ".jpg";
+var backgroundImage = "img/background.jpg";
 
 var tee, head, wood, controls;
 
@@ -14,16 +13,8 @@ var lookAt = new THREE.Vector3(0, 0, 0);
 var headView = new THREE.Vector3(0.01, 20, 0.1);
 var sideView = new THREE.Vector3(20, 20, 2);
 var textView = new THREE.Vector3(14, 7, 11);
-var threeDView = new THREE.Vector3(3, 25, 13);
 
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
-
-
-// https://stackoverflow.com/a/7228322
-function randomIntFromInterval(min, max) // min and max included
-{
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
 
 
 function changeText(text) {

@@ -45,7 +45,6 @@
 
             <li><a id="head" href="#">Kopfansicht</a></li>
             <li><a id="side" href="#">Seitenansicht</a></li>
-            <li><a id="3d" href="#">3D-Ansicht</a></li>
 
             <li><a id="headTransparent" href="#">Head transparent</a></li>
 
@@ -72,7 +71,7 @@
             </li>
 
             <li>
-                <a id="engravedBy" href="https://www.edelraster.at/" target="_blank">Engraved by<img src="img/edelraster_logo.png" alt="edelraster.at" /></a>
+                <a id="engravedBy" href="https://www.edelraster.at/" target="_blank">Engraving by <img src="img/edelraster_logo.png" alt="edelraster.at" /></a>
             </li>
 
         </ul>
@@ -91,10 +90,6 @@
 
     document.getElementById('side').addEventListener('click', function () {
         moveAndLookAt(sideView, lookAt, 500);
-    });
-
-    document.getElementById('3d').addEventListener('click', function () {
-        moveAndLookAt(threeDView, lookAt, 500);
     });
 
     document.getElementById('engraving').addEventListener('click', function () {
