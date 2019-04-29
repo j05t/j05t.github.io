@@ -169,7 +169,7 @@ loader.load('model/tee.dae', function (collada) {
     scene.add(tee);
 
     // add controls for tee
-    controls = new THREE.OrbitControls(camera);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.minDistance = 20;
     controls.maxDistance = 40;
     controls.enablePan = false;
