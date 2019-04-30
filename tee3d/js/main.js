@@ -1,6 +1,6 @@
 var backgroundImage = "img/background.jpg";
 
-var tee, head, wood, controls;
+var tee, head, wood, controls, baseHead;
 
 var basePosition = new THREE.Vector3(110, 0, 0);
 
@@ -81,6 +81,8 @@ bgTexture = loader.load(backgroundImage,
     }
 );
 
+
+
 scene.background = bgTexture;
 bgTexture.wrapS = THREE.MirroredRepeatWrapping;
 bgTexture.wrapT = THREE.MirroredRepeatWrapping;
@@ -151,6 +153,9 @@ loader.load('model/tee.dae', function (collada) {
     wood.castShadow = true;
     wood.receiveShadow = true;
 
+    // do not load default texture
+    head.material.map = null;
+
     wood.material.map = dynamicTexture.texture;
 
     // load base texture
@@ -158,6 +163,22 @@ loader.load('model/tee.dae', function (collada) {
     console.log("changed text in collada loader")
 
     scene.add(tee);
+
+
+    // load logo with transparency on top of head mesh so that changing the diffuse color
+    // of the head mesh does not change the color of the logo itself
+    loader = new THREE.TextureLoader();
+    h2texture = loader.load("model/logo.png", function(texture) {
+        var baseHeadgeometry = head.geometry;
+
+        // set transparent : true and depthWrite : false to only show logo
+        var baseHeadMaterial = new THREE.MeshPhongMaterial({ map:texture, transparent: true, depthWrite: false});
+        baseHead = new THREE.Mesh(baseHeadgeometry, baseHeadMaterial);
+
+        head.add(baseHead);
+        console.log("added base head mesh with transparent logo");
+    });
+
 
     // add controls for tee
     controls = new THREE.OrbitControls(camera, renderer.domElement);
