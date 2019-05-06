@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0</authoring_tool>
     </contributor>
-    <created>2019-04-09T13:23:57</created>
-    <modified>2019-04-09T13:23:57</modified>
+    <created>2019-05-06T10:53:08</created>
+    <modified>2019-05-06T10:53:08</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -14,8 +14,11 @@
     <image id="kernbuche_holzart_jpg" name="kernbuche_holzart_jpg">
       <init_from>kernbuche_holzart.jpg</init_from>
     </image>
-    <image id="logo_jpg" name="logo_jpg">
-      <init_from>logo.jpg</init_from>
+    <image id="logo_png" name="logo_png">
+      <init_from>logo.png</init_from>
+    </image>
+    <image id="logo_png_001" name="logo_png_001">
+      <init_from>logo.png</init_from>
     </image>
   </library_images>
   <library_effects>
@@ -57,14 +60,14 @@
     </effect>
     <effect id="Material_001_001-effect">
       <profile_COMMON>
-        <newparam sid="logo_jpg-surface">
+        <newparam sid="logo_png_001-surface">
           <surface type="2D">
-            <init_from>logo_jpg</init_from>
+            <init_from>logo_png_001</init_from>
           </surface>
         </newparam>
-        <newparam sid="logo_jpg-sampler">
+        <newparam sid="logo_png_001-sampler">
           <sampler2D>
-            <source>logo_jpg-surface</source>
+            <source>logo_png_001-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -76,7 +79,7 @@
               <color sid="ambient">1 1 1 1</color>
             </ambient>
             <diffuse>
-              <texture texture="logo_jpg-sampler"/>
+              <texture texture="logo_png_001-sampler"/>
             </diffuse>
             <specular>
               <color sid="specular">0.25 0.25 0.25 1</color>

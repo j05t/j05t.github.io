@@ -139,7 +139,7 @@ spotLight_04.position.z = -20;
 
 loader = new THREE.ColladaLoader();
 loader.load('model/tee.dae', function (collada) {
-    collada.scene.scale.set(12, 12, 12);
+    collada.scene.scale.set(8, 8, 8);
     tee = collada.scene;
 
     tee.rotation.z = Math.PI;
@@ -174,6 +174,10 @@ loader.load('model/tee.dae', function (collada) {
         // set transparent : true and depthWrite : false to only show logo
         var baseHeadMaterial = new THREE.MeshPhongMaterial({ map:texture, transparent: true, depthWrite: false});
         baseHead = new THREE.Mesh(baseHeadgeometry, baseHeadMaterial);
+
+        // scale texture
+        baseHead.material.map.repeat.set(0.8,0.8);
+        baseHead.material.map.offset.set(0.1,0.1);
 
         head.add(baseHead);
         console.log("added base head mesh with transparent logo");
