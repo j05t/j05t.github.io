@@ -1,3 +1,11 @@
+// onclick handler installed at customizer/catalog/view/javascript/fancy_design/FancyProductDesigner-all.min.js
+
+// 		else if(action === 'preview-lightbox') {
+//
+//			tee3dpreview();
+//
+//		}
+
 // send to 3d preview button
 // https://stackoverflow.com/questions/6755314/canvas-imagedata-remove-white-pixels
 function white2transparent(img)
@@ -19,9 +27,9 @@ function white2transparent(img)
     for (var p = 0; p<pixel.length; p+=4)
     {
       if (
-          pixel[p+r] == 255 &&
-          pixel[p+g] == 255 &&
-          pixel[p+b] == 255) // if white then change alpha to 0
+          pixel[p+r] === 255 &&
+          pixel[p+g] === 255 &&
+          pixel[p+b] === 255) // if white then change alpha to 0
       {pixel[p+a] = 0;}
     }
 
@@ -30,52 +38,56 @@ function white2transparent(img)
     return c.toDataURL('image/png');
 }
 
-// send to tee3d
-var form = document.createElement("form");
-form.setAttribute("method", "post");
-form.setAttribute("action", "/tee3d/index.php");
+var tee3dpreview = function() {
+		// send to tee3d
+	var form = document.createElement("form");
+	form.setAttribute("method", "post");
+	form.setAttribute("action", "/tee3d/index.php");
 
-form.setAttribute("target", "view");
+	form.setAttribute("target", "view");
 
-var hiddenField = document.createElement("input"); 
+	var hiddenField = document.createElement("input"); 
 
-var imgData;
+	var imgData;
 
-// hide background images
-fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 0;
-fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0;
-fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 0;
+	// hide background images
+	fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 0;
+	fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0;
+	fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 0;
 
-// send logo image
-fancyProductDesigner.createImage(false,false, "#ffffff")
-fancyProductDesigner.getViewsDataURL(function(dataURLs) {
-	var dataURL = dataURLs[fancyProductDesigner.currentViewIndex];
+	// send logo image
+	fancyProductDesigner.createImage(false,false, "#ffffff")
+	fancyProductDesigner.getViewsDataURL(function(dataURLs) {
+		var dataURL = dataURLs[fancyProductDesigner.currentViewIndex];
 
-	var img = new Image();
-	img.src = dataURL;
+		var img = new Image();
+		img.src = dataURL;
 
-	img.onload = function() {
-		imgData = white2transparent(img);
+		img.onload = function() {
+			imgData = white2transparent(img);
 
-		hiddenField.setAttribute("type", "hidden");
-		hiddenField.setAttribute("name", "message");
-		hiddenField.setAttribute("value", imgData );
-		form.appendChild(hiddenField);
-		document.body.appendChild(form);
+			hiddenField.setAttribute("type", "hidden");
+			hiddenField.setAttribute("name", "message");
+			hiddenField.setAttribute("value", imgData );
+			form.appendChild(hiddenField);
+			document.body.appendChild(form);
 
-		window.open('', 'view');
+			window.open('', 'view');
 
-		form.submit();
+			form.submit();
 
-		fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 1;
-		fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0.5;
-		fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 1;	
-		
-		// reset view
-		fancyProductDesigner.resetZoom()
-	}
+			fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 1;
+			fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0.5;
+			fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 1;	
+			
+			// reset view
+			fancyProductDesigner.resetZoom()
+		}
 
-});
+	});
+}
+
+
 
 
 
