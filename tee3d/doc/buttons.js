@@ -8,7 +8,7 @@
 
 // send to 3d preview button
 // https://stackoverflow.com/questions/6755314/canvas-imagedata-remove-white-pixels
-function white2transparent(img)
+var white2transparent = function (img)
 {
     var c = document.createElement('canvas');
 
@@ -33,8 +33,15 @@ function white2transparent(img)
       {pixel[p+a] = 0;}
     }
 
-    ctx.putImageData(imageData,0,0);
+	ctx.putImageData(imageData,0,0);
 
+	// crop center
+	ctx.globalCompositeOperation='destination-in';
+	ctx.beginPath();
+	ctx.arc(300,300,230,0,Math.PI*2);
+	ctx.closePath();
+	ctx.fill();
+	
     return c.toDataURL('image/png');
 }
 
@@ -113,15 +120,3 @@ fancyProductDesigner.getViewsDataURL(function(dataURLs) {
 fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 1;
 fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0.5;
 fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 1;
-
-
-
-
-
-// todo on tee3d:
-head.material.map.image = logo
-//head.material.transparent = true
-head.material.map.needsUpdate = true
-
-// white to alpha
-
