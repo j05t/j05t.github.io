@@ -177,15 +177,21 @@ loader.load('model/tee.dae', function (collada) {
 
 
     // add controls for tee
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.minDistance = 20;
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls.minDistance = 18;
     controls.maxDistance = 40;
-    controls.enablePan = false;
-    controls.enableZoom = true;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 1;
-    tee.controls = controls;
-    controls.enabled = true;
+
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan = false;
+
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+
+    controls.keys = [ 65, 83, 68 ];
 });
 
 // debug
