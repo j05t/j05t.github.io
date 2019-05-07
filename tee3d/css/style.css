@@ -15,8 +15,25 @@ a:hover {
 #visuplan {
     position: fixed;
     right: 18px;
-    top: 10px;
+    top: 45px;
     z-index: 0;
+    width: 160px;
+}
+
+#line {
+    position: absolute;
+    top: 52px;
+    left: 200px;
+    right: 200px;
+}
+
+hr {
+
+    color: #ededed;
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
 }
 
 #icon_visibility {
@@ -38,6 +55,11 @@ body {
     padding: 0;
     font-family: helvetica, arial, serif;
     overflow: hidden;
+
+    /* background keeping initial size
+    background: url(../img/background.jpg) no-repeat center center;
+    background-size: initial;
+    */
 }
 
 #menuToggle {
@@ -133,8 +155,7 @@ body {
     height: 100%;
     width: 200px;
     margin: -100px 0 0 -50px;
-    padding: 50px;
-    padding-top: 125px;
+    padding: 125px 50px 50px;
 
     background: #ededed;
     list-style-type: none;

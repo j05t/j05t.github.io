@@ -120,6 +120,10 @@
     <img id="visuplan" src="img/visuplan-3d-visualisierungen-logo.png" alt="Logo Visuplan" />
 </a>
 
+<div id="line">
+    <hr/>
+</div>
+
 <script src="js/listeners.js"></script>
 
 </body>
