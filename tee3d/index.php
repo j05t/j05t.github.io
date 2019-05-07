@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 
+
 <body>
 
 <script src="js/three.min.js"></script>
@@ -16,6 +17,45 @@
 <script src="js/OrbitControls.js"></script>
 <script src="js/Tween.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+
+    logo = new Image();
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function changeLogo() {
+        while( (typeof baseHead == 'undefined') || !logo.complete) {
+            await sleep(500);
+            console.log("slept 500ms");
+        }
+
+        console.log("typeof baseHead !== undefined");
+        baseHead.material.map.image = logo;
+
+        // scale texture
+        baseHead.material.map.repeat.set(0.8,0.8);
+        baseHead.material.map.offset.set(0.1,0.1);
+
+        baseHead.material.map.needsUpdate = true;
+    }
+
+    <?php if ( !empty($_POST['message']) ): ?>
+        console.log("got image via POST request");
+
+        logo.onload = function() {
+
+          changeLogo();
+
+        }
+
+        logo.src = "<?php print($_POST['message']) ?>";
+    <?php endif ?>
+
+</script>
+
 
 <!-- nav and corresponding css modified from https://codepen.io/erikterwan/pen/EVzeRP -->
 <!--    Made by Erik Terwan    -->
