@@ -10,51 +10,12 @@
 
 <body>
 
-<script>
-    // load scripts sequentially
-    (function() {
-
-        var scripts = [
-            "js/three.min.js",
-            "js/threex.dynamictexture.js",
-            "js/ColladaLoader.js",
-            "js/OrbitControls.js",
-            "js/Tween.js",
-            "js/main.js",
-            "js/listeners.js"
-        ];
-
-        function checkStateAndCall(path, callback) {
-            var _success = false;
-            return function() {
-                if (!_success && (!this.readyState || (this.readyState == 'complete'))) {
-                    _success = true;
-                    callback();
-                }
-            };
-        }
-
-        function asyncLoadScripts(files) {
-            function loadNext() { // chain element
-                if (!files.length) return;
-                var path = files.shift();
-                var scriptElm = document.createElement('script');
-                scriptElm.type = 'text/javascript';
-                scriptElm.async = true;
-                scriptElm.src = path;
-
-                // load next file in chain when this one will be ready
-                scriptElm.onload = scriptElm.onreadystatechange =  checkStateAndCall(path, loadNext);
-                var headElm = document.head || document.getElementsByTagName('head')[0];
-                headElm.appendChild(scriptElm);
-            }
-            loadNext(); // start a chain
-        }
-
-        asyncLoadScripts(scripts);
-    })();
-
-</script>
+<script src="js/three.min.js"></script>
+<script src='js/threex.dynamictexture.js'></script>
+<script src="js/ColladaLoader.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/Tween.js"></script>
+<script src="js/main.js"></script>
 
 <!-- nav and corresponding css modified from https://codepen.io/erikterwan/pen/EVzeRP -->
 <!--    Made by Erik Terwan    -->
@@ -118,6 +79,8 @@
 <a href="https://visuplan.at">
     <img id="visuplan" src="img/visuplan-3d-visualisierungen-logo.png" alt="Logo Visuplan" />
 </a>
+
+<script src="js/listeners.js"></script>
 
 </body>
 

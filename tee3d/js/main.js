@@ -73,15 +73,7 @@ function getSpotlight(color, intensity) {
 // construct scene and add background image
 var scene = new THREE.Scene();
 loader = new THREE.TextureLoader();
-bgTexture = loader.load(backgroundImage,
-    function (texture) {
-        var img = texture.image;
-        bgWidth = img.width;
-        bgHeight = img.height;
-    }
-);
-
-
+bgTexture = loader.load(backgroundImage);
 
 scene.background = bgTexture;
 bgTexture.wrapS = THREE.MirroredRepeatWrapping;
@@ -168,16 +160,16 @@ loader.load('model/tee.dae', function (collada) {
     // load logo with transparency on top of head mesh so that changing the diffuse color
     // of the head mesh does not change the color of the logo itself
     loader = new THREE.TextureLoader();
-    h2texture = loader.load("model/logo.png", function(texture) {
+    h2texture = loader.load("model/logo.png", function (texture) {
         var baseHeadgeometry = head.geometry;
 
         // set transparent : true and depthWrite : false to only show logo
-        var baseHeadMaterial = new THREE.MeshPhongMaterial({ map:texture, transparent: true, depthWrite: false});
+        var baseHeadMaterial = new THREE.MeshPhongMaterial({map: texture, transparent: true, depthWrite: false});
         baseHead = new THREE.Mesh(baseHeadgeometry, baseHeadMaterial);
 
         // scale texture
-        baseHead.material.map.repeat.set(0.8,0.8);
-        baseHead.material.map.offset.set(0.1,0.1);
+        baseHead.material.map.repeat.set(0.8, 0.8);
+        baseHead.material.map.offset.set(0.1, 0.1);
 
         head.add(baseHead);
         console.log("added base head mesh with transparent logo");

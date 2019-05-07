@@ -10,7 +10,7 @@ document.getElementById('side').addEventListener('click', function () {
 document.getElementById('engraving').addEventListener('click', function () {
     const img = document.getElementById("icon_visibility");
 
-    if(showEngraving) {
+    if (showEngraving) {
         showEngraving = false;
         img.className = "icon_invisible";
         changeText("");
@@ -72,7 +72,7 @@ document.getElementById('zfff').addEventListener('click', function () {
 });
 
 // firefox
-document.body.onload = function() {
+document.body.onload = function () {
     console.log("loaded body");
     changeText(engravingText);
 };
