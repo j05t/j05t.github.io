@@ -1,7 +1,6 @@
 @font-face {
     font-family: futurab;
     src: url("futurab.ttf"), url("futurab.woff");
-    font-weight: bold;
 }
 
 a, a:visited {
@@ -28,7 +27,6 @@ a:hover {
 }
 
 hr {
-
     color: #ededed;
     display: block;
     height: 1px;
@@ -178,7 +176,6 @@ body {
     height: 1.6em;
     border: none;
     resize: none;
-
     font-size: 16px;
     padding-left: 5px;
 }
@@ -191,9 +188,10 @@ body {
 }
 
 #teeDescription {
-    height: 16em;
+    height: fit-content;
     background: aliceblue;
     font-size: 14px;
+    font-family: Helvetica, sans-serif;
 }
 
 #engravedBy {
