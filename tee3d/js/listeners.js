@@ -22,8 +22,8 @@ document.getElementById('engraving').addEventListener('click', function () {
 });
 
 
-document.getElementById('headTransparent').addEventListener('click', function () {
-    toggleTransparency(head);
+document.getElementById('tilted').addEventListener('click', function () {
+    // TODO: move to tilted view
 });
 
 
