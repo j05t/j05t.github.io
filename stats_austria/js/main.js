@@ -181,8 +181,11 @@ d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
         .append("path")
         .attr("d", path)
         .attr("fill", d => effectController.colorScale(effectController.data.get(d.properties.iso)))
-        .on("click", clicked)
-        .append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
+        .on("click", clicked)    // show description for urbanity codes
+        .append("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(effectController.data.get(d.properties.iso)));
+
+    // show default title
+    //.append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
 });
 
 

@@ -1,4 +1,4 @@
-var population, urbanity;
+var population, urbanity, urbanityCodeNames;
 
 
 // Urban-Rural-Typologie von Statistik Austria
