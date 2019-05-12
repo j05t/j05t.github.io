@@ -77,7 +77,7 @@ effectController = {
     showPopulation: false,
     colorScale: urbanityColorScale,
     data: urbanity,
-    granularity: "Gemeinde",
+    granularity: "Bezirk",
     causesOfDeath: "Malignant neoplasms",
     year: 1970,
     animate: false,
