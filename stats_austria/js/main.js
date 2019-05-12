@@ -213,7 +213,7 @@ onColorUrbanityController.onChange(function (value) {
         features.selectAll("path")
             .selectAll("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(effectController.data.get(d.properties.iso)));
     } else {
-        if (effectController.showPopulation === false) {
+        if (effectController.colorPopulation === false) {
             clearColor();
         }
     }
@@ -227,7 +227,7 @@ onColorPopulationController.onChange(function (value) {
         effectController.colorScale = populationColorScale;
         updateMapAndGui();
     } else {
-        if (effectController.showPopulation === false) {
+        if (effectController.colorPopulation === false) {
             clearColor();
         }
     }
