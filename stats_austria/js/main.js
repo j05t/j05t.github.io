@@ -53,13 +53,13 @@ var svg = d3.select("body").append("svg")
 var features = svg.append("g")
     .attr("class", "features");
 
-// Group for the map bubbles
-var bubbles = svg.append("g")
-    .attr("class", "bubbles");
-
 // Group for the districts and provinces
 var districts = svg.append("g")
     .attr("class", "districts");
+
+// Group for the map bubbles
+var bubbles = svg.append("g")
+    .attr("class", "bubbles");
 
 
 //Create zoom/pan listener
@@ -334,6 +334,7 @@ var showDistricts = function () {
 }
 
 // attach random  prevalence data to each district geofeature
+// TODO: use real data
 var insertData = function (value, key, map) {
 
     value.causesOfDeath = new Map();
