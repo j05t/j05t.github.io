@@ -25,6 +25,10 @@ var urbanityColorScale = d3.scale.ordinal()
         "#f7ef58", "#e4f541", "#b8e186",
         "#7fbc41", "#4d9221", "#276419"]);
 
+var deathsColorScale = d3.scale.linear()
+    .domain([0, 100000])
+    .range(["#fffdfb", "#d22b00"]);
+
 // Map dimensions (in pixels)
 var width = window.innerWidth - 20,
     height = window.innerHeight - 20;
@@ -44,6 +48,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
+
 // Group for the map features
 var features = svg.append("g")
     .attr("class", "features");
@@ -51,6 +56,10 @@ var features = svg.append("g")
 // Group for the map bubbles
 var bubbles = svg.append("g")
     .attr("class", "bubbles");
+
+// Group for the districts and provinces
+var districts = svg.append("g")
+    .attr("class", "districts");
 
 
 //Create zoom/pan listener
@@ -63,13 +72,17 @@ svg.call(zoom);
 
 
 effectController = {
-    colorUrbanity: true,
+    colorUrbanity: false,
     colorPopulation: false,
     showPopulation: false,
     colorScale: urbanityColorScale,
-    data: urbanity
+    data: urbanity,
+    granularity: "Gemeinde",
+    causesOfDeath: "Malignant neoplasms",
+    year: 1970,
+    animate: false,
+    loop: true
 };
-
 
 // display map legend at bottom right
 effectController.legend = svg.append("g")
@@ -79,14 +92,99 @@ effectController.legend = svg.append("g")
     .attr("class", "legend")
     .style("font", "10px sans-serif");
 
+
+// construct GUI and assign callback functions
 var gui = new dat.GUI();
 
 var f1 = gui.addFolder('Coloring');
 var onColorUrbanityController = f1.add(effectController, 'colorUrbanity');
 var onColorPopulationController = f1.add(effectController, 'colorPopulation');
+f1.open();
+
 var f2 = gui.addFolder('Detailed Information');
+
+var f3 = gui.addFolder("Animation");
+f3.open();
+
+// listen() for variable changes at runtime
+var onYearChangeController = f3.add(effectController, 'year', 1970, 2017).step(1).listen();
+var onAnimateController = f3.add(effectController, 'animate');
+f3.add(effectController, 'loop');
 var onShowPopulationController = f2.add(effectController, 'showPopulation');
-f2.open();
+var onShowDistrictController = f1.add(effectController, 'granularity', ['Gemeinde', 'Bezirk', 'Bundesland']).listen();
+var onShowCausesOfDeathController = f1.add(effectController, 'causesOfDeath', causesOfDeathGroups);
+
+
+var animate = function () {
+
+    if (effectController.loop && effectController.year >= 2017) {
+        effectController.year = 1970;
+    }
+
+    if (effectController.animate && effectController.year < 2017) {
+        requestAnimationFrame(animate, 1000);
+    } else {
+        onAnimateController.setValue(false);
+    }
+
+    effectController.year += 0.1;
+
+    updateDistrictColor();
+}
+
+
+// show causes of death data here
+var updateDistrictColor = function () {
+    let year = Math.round(effectController.year);
+
+    let getRoundedData = function (d) {
+        return Math.floor(d.causesOfDeath.get(year)[causesOfDeathGroups.indexOf(effectController.causesOfDeath)]);
+    }
+
+    districts.selectAll("path")
+        .data(districtGeofeatures)
+        .attr("fill", d => deathsColorScale(getRoundedData(d)));
+
+    districts.selectAll("path")
+        .data(districtGeofeatures)
+        .selectAll("title").text(d => d.properties.name + ": " + getRoundedData(d));
+}
+
+
+onAnimateController.onChange(function (value) {
+    // we have only data on district level
+    if (value && effectController.granularity === "Bezirk") {
+        animate();
+    } else {
+        effectController.animate = false;
+    }
+});
+
+onYearChangeController.onChange(function (value) {
+    if (value) {
+        effectController.year = value;
+        updateDistrictColor();
+    }
+});
+
+onShowDistrictController.onChange(function (value) {
+    if (value) {
+        if (value === "Bezirk") {
+            showDistricts();
+        } else if (value === "Bundesland") {
+            showProvinces();
+        } else {
+            districts.selectAll("*").remove();
+        }
+    }
+});
+
+onShowCausesOfDeathController.onChange(function (value) {
+    if (value) {
+        effectController.granularity = "Bezirk";
+        showDistricts();
+    }
+});
 
 
 var updateMapAndGui = function () {
@@ -98,6 +196,12 @@ var updateMapAndGui = function () {
         .selectAll("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
 };
 
+var clearColor = function () {
+    features.selectAll("path")
+        .data(effectController.geofeatures)
+        .attr("fill", "#cfcfcf");
+}
+
 onColorUrbanityController.onChange(function (value) {
     if (value) {
         effectController.data = urbanity;
@@ -108,8 +212,13 @@ onColorUrbanityController.onChange(function (value) {
         // show description for urbanity codes
         features.selectAll("path")
             .selectAll("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(effectController.data.get(d.properties.iso)));
+    } else {
+        if (effectController.showPopulation === false) {
+            clearColor();
+        }
     }
 });
+
 
 onColorPopulationController.onChange(function (value) {
     if (value) {
@@ -117,6 +226,10 @@ onColorPopulationController.onChange(function (value) {
         onColorUrbanityController.setValue(false);
         effectController.colorScale = populationColorScale;
         updateMapAndGui();
+    } else {
+        if (effectController.showPopulation === false) {
+            clearColor();
+        }
     }
 });
 
@@ -167,7 +280,8 @@ onShowPopulationController.onChange(function (value) {
     }
 });
 
-
+// initial view
+// https://github.com/ginseng666/GeoJSON-TopoJSON-Austria
 d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
     if (error) return console.log(error); //unknown error, check the console
 
@@ -180,13 +294,89 @@ d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
         .enter()
         .append("path")
         .attr("d", path)
-        .attr("fill", d => effectController.colorScale(effectController.data.get(d.properties.iso)))
-        .on("click", clicked)    // show description for urbanity codes
+        .attr("fill", "#cfcfcf")
+        .on("click", clicked)    // onclick handler
         .append("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(effectController.data.get(d.properties.iso)));
+
+    // start showing district data
+    showDistricts();
 
     // show default title
     //.append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
 });
+
+
+var districtGeofeatures;
+var showDistricts = function () {
+    d3.json("data/bezirke_999_topo.json", function (error, geodata) {
+        if (error) return console.log(error); //unknown error, check the console
+
+        districts.selectAll("*").remove();
+
+        //generate features from TopoJSON
+        districtGeofeatures = topojson.feature(geodata, geodata.objects.bezirke).features;
+
+        // create and insert random prevalence data here for causes of death
+        createRandomData(districtGeofeatures);
+
+        //Create a path for each map feature in the data
+        districts.selectAll("path")
+            .data(districtGeofeatures)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .on("click", clicked)
+            .append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
+
+        updateDistrictColor();
+
+    });
+}
+
+// attach random  prevalence data to each district geofeature
+var insertData = function (value, key, map) {
+
+    value.causesOfDeath = new Map();
+
+    // create data for each district and year
+    for (let year = 1970; year <= 2017; year++) {
+        let mapData = [];
+
+        // create random prevalence data
+        for (let i = 0; i < causesOfDeathGroups.length; i++) {
+            let randInt = Math.random() * 100000;
+            mapData.push(randInt);
+        }
+
+        value.causesOfDeath.set(year, mapData);
+    }
+}
+
+var createRandomData = function (districtGeofeatures) {
+    districtGeofeatures.forEach(insertData);
+};
+
+
+// TODO: show aggregate data
+var showProvinces = function () {
+    d3.json("data/laender_999_topo.json", function (error, geodata) {
+        if (error) return console.log(error); //unknown error, check the console
+
+        districts.selectAll("*").remove();
+
+        //generate features from TopoJSON
+        geofeatures = topojson.feature(geodata, geodata.objects.laender).features;
+
+        //Create a path for each map feature in the data
+        districts.selectAll("path")
+            .data(geofeatures)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .on("click", clicked)
+            .append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
+    });
+}
 
 
 // Add optional onClick events for features here
@@ -198,9 +388,11 @@ function clicked(d, i) {
 }
 
 
-//Update map on zoom/pan
+// Update map on zoom/pan
 function zoomed() {
     features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
+        .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
+    districts.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
     bubbles.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
