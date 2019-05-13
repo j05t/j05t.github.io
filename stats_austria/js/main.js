@@ -282,7 +282,7 @@ onShowPopulationController.onChange(function (value) {
 
 // initial view
 // https://github.com/ginseng666/GeoJSON-TopoJSON-Austria
-d3.json("data/gemeinden_999_topo.topojson", function (error, geodata) {
+d3.json("data/gemeinden_999_topo.json", function (error, geodata) {
     if (error) return console.log(error); //unknown error, check the console
 
     //generate features from TopoJSON
