@@ -83,7 +83,7 @@
 
             <li><a id="head" href="#">Kopfansicht</a></li>
             <li><a id="side" href="#">Seitenansicht</a></li>
-            <li><a id="tilted" href="#">Schrägansicht</a></li>
+            <li><a id="tilted" href="#">3D Ansicht</a></li>
 
             <li>
                 <a id="engraving" href="#"><img id="icon_visibility" src="css/img/visible.png" width="32" height="32" alt="Visibility Icon" />Beschriftung</a>

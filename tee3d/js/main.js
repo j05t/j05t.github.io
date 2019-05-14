@@ -1,6 +1,7 @@
 var backgroundImage = "img/background.jpg";
 
 var tee, head, wood, controls, baseHead;
+var rotate = true;
 
 var basePosition = new THREE.Vector3(110, 0, 0);
 
@@ -12,10 +13,31 @@ var oldPos;
 var lookAt = new THREE.Vector3(0, 0, 0);
 var headView = new THREE.Vector3(0.01, 20, 0.1);
 var sideView = new THREE.Vector3(20, 20, 2);
+var tiltedView = new THREE.Vector3(10, 14, 2);
 var textView = new THREE.Vector3(14, 7, 11);
 
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
 
+// reset trackball controls to original position
+var resetControls = function () {
+    new TWEEN.Tween(controls.object.position)
+        .to({x: controls.position0.x, y: controls.position0.y, z: controls.position0.z}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
+    new TWEEN.Tween(controls.target)
+        .to({x: controls.target0.x, y: controls.target0.y, z: controls.target0.z}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
+    new TWEEN.Tween(controls.object.up)
+        .to({x: controls.up0.x, y: controls.up0.y, z: controls.up0.z}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
+
+    new TWEEN.Tween(tee.rotation)
+        .to({x: -1.57, y: 0, _z: 3.15}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
+}
 
 function changeText(text) {
 
@@ -178,9 +200,11 @@ loader.load('model/tee.dae', function (collada) {
 
     // add controls for tee
     controls = new THREE.TrackballControls(camera, renderer.domElement);
+
     controls.minDistance = 18;
     controls.maxDistance = 40;
 
+    controls.autoRotate = false;
     controls.rotateSpeed = 1.0;
     controls.zoomSpeed = 1.2;
     controls.panSpeed = 0.8;
@@ -191,7 +215,7 @@ loader.load('model/tee.dae', function (collada) {
     controls.staticMoving = true;
     controls.dynamicDampingFactor = 0.3;
 
-    controls.keys = [ 65, 83, 68 ];
+    controls.keys = [65, 83, 68];
 });
 
 // debug
@@ -253,40 +277,6 @@ function toggleTransparency(object) {
     }
 }
 
-/* allow user to pick objects in 3d space
-
-// https://threejs.org/docs/#api/en/core/Raycaster
-renderer.domElement.addEventListener('mousedown', function () {
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2();
-
-    raycaster.far = 100;
-
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    // update the picking ray with the camera and mouse position
-    raycaster.setFromCamera(mouse, camera);
-
-    // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects(tee.children);
-
-    // do something for all intersecting objects
-    for (var i = 0; i < intersects.length; i++) {
-        //intersects[ i ].object.material.color.set( 0xff0000 );
-    }
-
-    if (intersects.length > 0) {
-        // only toggle transparency for closest hit object
-        toggleTransparency(intersects[0].object);
-    }
-
-});
-
-*/
-
 
 var render = function (time) {
 
@@ -297,7 +287,9 @@ var render = function (time) {
     if (typeof controls !== 'undefined') {
         controls.update();
     }
-
+    if (typeof tee !== 'undefined' && rotate) {
+        tee.rotation.z += 0.00142;
+    }
     renderer.render(scene, camera);
 };
 

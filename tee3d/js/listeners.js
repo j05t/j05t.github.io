@@ -1,10 +1,22 @@
 // setup sidebar menu onclick handlers
 document.getElementById('head').addEventListener('click', function () {
+    resetControls();
     moveAndLookAt(headView, lookAt, 500);
 });
 
 document.getElementById('side').addEventListener('click', function () {
+    resetControls();
     moveAndLookAt(sideView, lookAt, 500);
+});
+
+document.getElementById('tilted').addEventListener('click', function () {
+    resetControls();
+    moveAndLookAt(tiltedView, lookAt, 500);
+
+    new TWEEN.Tween(controls.object.up)
+        .to({x: -0.125, y: 0.96, z: 0.4}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
 });
 
 document.getElementById('engraving').addEventListener('click', function () {
@@ -21,12 +33,6 @@ document.getElementById('engraving').addEventListener('click', function () {
     }
 });
 
-
-document.getElementById('tilted').addEventListener('click', function () {
-    // TODO: move to tilted view
-});
-
-
 document.getElementById('engravingText').addEventListener('keyup', function () {
     engravingText = this.value;
     changeText(engravingText);
@@ -37,13 +43,19 @@ document.getElementById('engravingText').addEventListener('focus', function () {
     document.getElementById("icon_visibility").className = "icon_visible";
     changeText(engravingText);
 
-    controls.autoRotate = false;
+    rotate = false;
     oldPos = camera.position.clone();
+    resetControls();
     moveAndLookAt(textView, lookAt, 500);
+
+    new TWEEN.Tween(controls.object.up)
+        .to({x: -0.5, y: 0.4, z: 1.2}, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .start();
 });
 
 document.getElementById('engravingText').addEventListener('focusout', function () {
-    controls.autoRotate = true;
+    rotate = true;
     moveAndLookAt(oldPos, lookAt, 500);
 });
 
