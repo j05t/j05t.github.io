@@ -172,9 +172,8 @@ loader.load('model/tee.dae', function (collada) {
 
     wood.material.map = dynamicTexture.texture;
 
-    // load base texture
+    // load base texture and set default engraving text
     changeText(engravingText);
-    console.log("changed text in collada loader")
 
     scene.add(tee);
 
@@ -194,7 +193,6 @@ loader.load('model/tee.dae', function (collada) {
         baseHead.material.map.offset.set(0.1, 0.1);
 
         head.add(baseHead);
-        console.log("added base head mesh with transparent logo");
     });
 
 
@@ -218,9 +216,6 @@ loader.load('model/tee.dae', function (collada) {
     controls.keys = [65, 83, 68];
 });
 
-// debug
-//var axesHelper = new THREE.AxesHelper(20);
-//scene.add(axesHelper);
 
 // modified from
 // https://stackoverflow.com/questions/28091876/tween-camera-position-while-rotation-with-slerp-three-js
@@ -264,17 +259,6 @@ function moveAndLookAt(dstpos, dstlookat, duration) {
             camera.quaternion.set(qm.x, qm.y, qm.z, qm.w);
         }).easing(TWEEN.Easing.Quadratic.Out).start();
     }).call(this);
-}
-
-
-function toggleTransparency(object) {
-    if (object.material.transparent) {
-        object.material.transparent = false;
-        object.material.opacity = 1.0;
-    } else {
-        object.material.transparent = true;
-        object.material.opacity = 0.5;
-    }
 }
 
 

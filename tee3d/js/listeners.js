@@ -85,6 +85,5 @@ document.getElementById('zfff').addEventListener('click', function () {
 
 // firefox
 document.body.onload = function () {
-    console.log("loaded body");
     changeText(engravingText);
 };
