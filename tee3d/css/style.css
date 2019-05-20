@@ -6,6 +6,10 @@
     font-style: normal;
 }
 
+canvas {
+    font-family: 'futura_md_btbold';
+}
+
 a, a:visited {
     text-decoration: none;
     color: #000000;
