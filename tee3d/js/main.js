@@ -214,6 +214,9 @@ loader.load('model/tee.dae', function (collada) {
     controls.dynamicDampingFactor = 0.3;
 
     controls.keys = [65, 83, 68];
+
+    // hide loading animation when model is loaded
+    document.getElementById("loader").style.display = "none";
 });
 
 
