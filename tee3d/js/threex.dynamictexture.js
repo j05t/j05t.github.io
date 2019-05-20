@@ -19,7 +19,7 @@ THREEx.DynamicTexture = function (width, height) {
 
     this.context = canvas.getContext('2d');
 
-    this.context.font = "60px futurab";
+    this.context.font = "60px futura_md_btbold";
 
     this.texture = new THREE.Texture(canvas);
 

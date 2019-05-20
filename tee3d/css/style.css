@@ -1,6 +1,9 @@
 @font-face {
-    font-family: futurab;
-    src: url("futurab.ttf"), url("futurab.woff");
+    font-family: 'futura_md_btbold';
+    src: url('futurab-webfont.woff2') format('woff2'),
+    url('futurab-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 a, a:visited {
