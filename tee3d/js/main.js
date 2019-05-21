@@ -3,7 +3,7 @@ var backgroundImage = "img/background.jpg";
 var tee, head, wood, controls, baseHead;
 var rotate = true;
 
-var basePosition = new THREE.Vector3(110, 0, 0);
+var basePosition = new THREE.Vector3(0, -110, 0);
 
 var engravingText = "Engraving";
 var showEngraving = true;
@@ -11,10 +11,10 @@ var showEngraving = true;
 var oldPos;
 
 var lookAt = new THREE.Vector3(0, 0, 0);
-var headView = new THREE.Vector3(0.01, 20, 0.1);
-var sideView = new THREE.Vector3(20, 20, 2);
-var tiltedView = new THREE.Vector3(10, 14, 2);
-var textView = new THREE.Vector3(14, 7, 11);
+var headView = new THREE.Vector3(0, 0, 20);
+var sideView = new THREE.Vector3(20, 10, 0);
+var tiltedView = new THREE.Vector3(8, 17, 11);
+var textView = new THREE.Vector3(20, 0, 0);
 
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
 
@@ -40,6 +40,7 @@ var resetControls = function () {
 }
 
 function changeText(text) {
+    wood.material.map.flipY = false;
 
     dynamicTexture.clear();
 
@@ -51,17 +52,16 @@ function changeText(text) {
     dynamicTexture.context.translate(256, 512);
 
     // rotate the canvas to the specified degrees
-    dynamicTexture.context.rotate(270 * Math.PI / 180);
+    dynamicTexture.context.rotate(90 * Math.PI / 180);
 
     // center text on canvas
     var textSize = dynamicTexture.context.measureText(text);
-    var x = (-350 - textSize.width) / 2;
+    var x = (-270 - textSize.width) / 2;
 
 
     //                             + ^v -  <>
     //dynamicTexture.drawText(text, -400, 230, '0x0d0d0d');
-    dynamicTexture.drawText(text, x, 230, '#582813');
-
+    dynamicTexture.drawText(text, x, 10, '#582813');
 
     dynamicTexture.context.restore();
 
@@ -118,9 +118,8 @@ camera.position.set(sideView.x, sideView.y, sideView.z);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 // add hemisphere light
-var hemLight = new THREE.HemisphereLight(0xffffff, 0x080820, .42);
+var hemLight = new THREE.HemisphereLight(0xffffff, 0x080820, .6);
 scene.add(hemLight);
-
 
 // add spotlights
 var spotLight_01 = getSpotlight(0xffffff, .6);
@@ -151,16 +150,57 @@ spotLight_04.position.y = 15;
 spotLight_04.position.z = -20;
 
 
-loader = new THREE.ColladaLoader();
-loader.load('model/tee.dae', function (collada) {
-    collada.scene.scale.set(8, 8, 8);
-    tee = collada.scene;
+// debug: show lights and axes
+var g = new THREE.BoxGeometry(2,2,2,2,2,1)
+var m = new THREE.MeshBasicMaterial();
 
-    tee.rotation.z = Math.PI;
-    tee.position = basePosition;
+var c = new THREE.Mesh(g,m);
+c.position.set(spotLight_01.position.x,spotLight_01.position.y,spotLight_01.position.z)
+scene.add(c)
+
+c = new THREE.Mesh(g,m);
+c.position.set(spotLight_02.position.x,spotLight_02.position.y,spotLight_02.position.z)
+scene.add(c)
+
+c = new THREE.Mesh(g,m);
+c.position.set(spotLight_03.position.x,spotLight_03.position.y,spotLight_03.position.z)
+scene.add(c)
+
+c = new THREE.Mesh(g,m);
+c.position.set(spotLight_04.position.x,spotLight_04.position.y,spotLight_04.position.z)
+scene.add(c)
+
+
+var axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+
+
+
+var loader = new THREE.GLTFLoader();
+loader.load('model/tee.glb', function (geometry) {
+    tee = geometry.scene;
+    tee.scale.set(8,8,8);
 
     wood = tee.children[0];
-    head = tee.children[1];
+    let tip = tee.children[1];
+    head = tee.children[2];
+
+    // not set in glb file
+    head.material = new THREE.MeshPhongMaterial();
+    head.material.specular.setRGB(.25,.25,.25);
+
+    tip.material = new THREE.MeshPhongMaterial();
+    tip.material.specular.setRGB(.25,.25,.25);
+    tip.material.map =dynamicTexture.texture;
+
+    wood.material = new THREE.MeshPhongMaterial();
+    wood.material.specular.setRGB(.25,.25,.25);
+
+    head.rotation.y = Math.PI;
+
+    wood.position.y -= 0.42;
+    head.position.y -= 0.42;
+    tip.position.y -= 0.42;
 
     head.castShadow = true;
     head.receiveShadow = true;
@@ -174,9 +214,6 @@ loader.load('model/tee.dae', function (collada) {
 
     // load base texture and set default engraving text
     changeText(engravingText);
-
-    scene.add(tee);
-
 
     // load logo with transparency on top of head mesh so that changing the diffuse color
     // of the head mesh does not change the color of the logo itself
@@ -217,6 +254,8 @@ loader.load('model/tee.dae', function (collada) {
 
     // hide loading animation when model is loaded
     document.getElementById("loader").style.display = "none";
+
+    scene.add(tee);
 });
 
 
@@ -275,7 +314,7 @@ var render = function (time) {
         controls.update();
     }
     if (typeof tee !== 'undefined' && rotate) {
-        tee.rotation.z += 0.00142;
+        tee.rotation.y -= 0.00142;
     }
     renderer.render(scene, camera);
 };
