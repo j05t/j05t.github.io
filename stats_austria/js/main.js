@@ -1,5 +1,8 @@
 // basic d3 map template from mapstarter.com
 
+var districtGeofeatures, stateGeofeatures;
+;
+
 // d3.schemeBlues[9]
 //         .range(["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"]);
 var populationColorScale = d3.scale.log()
@@ -132,7 +135,7 @@ var onAnimateController = f3.add(effectController, 'animate');
 f3.add(effectController, 'loop');
 var onShowPopulationController = f2.add(effectController, 'showPopulation');
 var onShowCasesController = f2.add(effectController, 'showCases');
-var onGranularityChangeController = f1.add(effectController, 'granularity', ['Gemeinde', 'Bezirk', 'Bundesland']).listen();
+var onGranularityChangeController = f1.add(effectController, 'granularity', ['Gemeinde', /* 'Bezirk' , */ 'Bundesland']).listen();
 var onShowCausesOfDeathController = f1.add(effectController, 'causesOfDeath', causesOfDeathGroups);
 
 
@@ -159,6 +162,8 @@ var animate = function () {
 
 
 let getData = function (d) {
+    let year = Math.round(effectController.year);
+
     //return Math.floor(d.causesOfDeath.get(year)[causesOfDeathGroups.indexOf(effectController.causesOfDeath)]);
     return effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
 }
@@ -172,13 +177,34 @@ let getIncidence = function (d) {
     return incidence;
 }
 
+
+let updateDistricts = function (features) {
+    if (districts.selectAll("path")[0].length === 0) {
+        // we have to create the paths first
+        districts.selectAll("path")
+            .data(features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("fill", d => deathsColorScale(getIncidence(d)))
+            .on("click", clicked)
+            .append("title").text(d => d.properties.name + ": " + getIncidence(d));
+    } else {
+        // update for each map feature in the data
+        districts.selectAll("path")
+            .data(features)
+            .attr("d", path)
+            .attr("fill", d => deathsColorScale(getIncidence(d)))
+            .on("click", clicked)
+            .select("title").text(d => d.properties.name + ": " + getIncidence(d));
+    }
+}
+
 // show causes of death data here
 var updateColor = function () {
-
     municipalities.selectAll("path")
         .data(effectController.geofeatures)
         .attr("fill", d => deathsColorScale(getIncidence(d)));
-
 
     municipalities.selectAll("path")
         .data(effectController.geofeatures)
@@ -188,15 +214,14 @@ var updateColor = function () {
     if (effectController.showCases || effectController.showPopulation) {
         updateBubbles();
     }
-    /*
-    districts.selectAll("path")
-        .data(districtGeofeatures)
-        .attr("fill", d => deathsColorScale(getRoundedData(d)));
 
-    districts.selectAll("path")
-        .data(districtGeofeatures)
-        .selectAll("title").text(d => d.properties.name + ": " + getRoundedData(d));
- */
+    if (effectController.granularity === "Bundesland") {
+        updateDistricts(stateGeofeatures);
+    } else if (effectController.granularity === "Bezirk") {
+        updateDistricts(districtGeofeatures);
+    }
+
+
 }
 
 
@@ -218,12 +243,12 @@ onYearChangeController.onChange(function (value) {
 
 onGranularityChangeController.onChange(function (value) {
     if (value) {
+        districts.selectAll("*").remove();
+
         if (value === "Bezirk") {
             showDistricts();
         } else if (value === "Bundesland") {
             showStates();
-        } else {
-            districts.selectAll("*").remove();
         }
     }
 });
@@ -413,78 +438,56 @@ d3.json("data/gemeinden_wien_bezirke_topo.json", function (error, geodata) {
     //.append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
 });
 
-
-var districtGeofeatures;
 var showDistricts = function () {
-    d3.json("data/bezirke_999_topo.json", function (error, geodata) {
-        if (error) return console.log(error); //unknown error, check the console
 
-        districts.selectAll("*").remove();
+    if (typeof districtGeofeatures === "undefined") {
 
-        //generate municipalities from TopoJSON
-        districtGeofeatures = topojson.feature(geodata, geodata.objects.bezirke).features;
+        d3.json("data/bezirke_999_topo.json", function (error, geodata) {
+            if (error) return console.log(error); //unknown error, check the console
 
-        // create and insert random prevalence data here for causes of death
-        createRandomData(districtGeofeatures);
+            //generate municipalities from TopoJSON
+            districtGeofeatures = topojson.feature(geodata, geodata.objects.bezirke).features;
 
-        //Create a path for each map feature in the data
-        districts.selectAll("path")
-            .data(districtGeofeatures)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .on("click", clicked)
-            .append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
+            districts.selectAll("path")
+                .data(districtGeofeatures)
+                .enter()
+                .append("path")
+                .attr("d", path)
+                .on("click", clicked)
+               // .append("title").text(d => d.properties.name + ": " + getData(d));
 
-        updateColor();
-
-    });
-}
-
-// attach random  prevalence data to each district geofeature
-// TODO: use real data
-var createRandomDistrictData = function (value, key, map) {
-
-    value.causesOfDeath = new Map();
-
-    // create data for each district and year
-    for (let year = 1970; year <= 2017; year++) {
-        let mapData = [];
-
-        // create random prevalence data
-        for (let i = 0; i < causesOfDeathGroups.length; i++) {
-            let randInt = Math.random() * 100000;
-            mapData.push(randInt);
-        }
-
-        value.causesOfDeath.set(year, mapData);
+            // todo: use real data
+           // updateDistricts(districtGeofeatures);
+        });
+    } else {
+        // todo: use real data
+        // updateDistricts(districtGeofeatures);
     }
 }
 
-var createRandomData = function (districtGeofeatures) {
-    districtGeofeatures.forEach(createRandomDistrictData);
-};
 
-
-// TODO: show aggregate data
 var showStates = function () {
-    d3.json("data/laender_999_topo.json", function (error, geodata) {
-        if (error) return console.log(error); //unknown error, check the console
 
-        districts.selectAll("*").remove();
+    if (typeof stateGeofeatures === "undefined") {
+        d3.json("data/laender_999_topo.json", function (error, geodata) {
+            if (error) return console.log(error); //unknown error, check the console
 
-        //generate municipalities from TopoJSON
-        geofeatures = topojson.feature(geodata, geodata.objects.laender).features;
+            //generate municipalities from TopoJSON
+            stateGeofeatures = topojson.feature(geodata, geodata.objects.laender).features;
 
-        //Create a path for each map feature in the data
-        districts.selectAll("path")
-            .data(geofeatures)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .on("click", clicked)
-            .append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
-    });
+            districts.selectAll("path")
+                .data(stateGeofeatures)
+                .enter()
+                .append("path")
+                .attr("d", path)
+                .on("click", clicked)
+                .append("title").text(d => d.properties.name + ": " + getData(d));
+
+            updateDistricts(stateGeofeatures);
+        });
+    } else {
+        updateDistricts(stateGeofeatures);
+    }
 }
 
 
