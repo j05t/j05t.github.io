@@ -21,17 +21,19 @@ var populationColorScale = d3.scale.log()
 // 410 Laendlicher Raum, zentral
 // 420 Laendlicher Raum, intermediaer
 // 430 Laendlicher Raum, periphaer
+var urbanityColorRange = ["#8e0152", "#c51b7d", "#de77ae",
+    "#f1b62c", "#fddf17",
+    "#f7ef58", "#e4f541", "#b8e186",
+    "#7fbc41", "#4d9221", "#276419"];
 var urbanityColorScale = d3.scale.ordinal()
     .domain([101, 102, 103, 210, 220, 310, 320, 330, 410, 420, 430])
-    .range(["#8e0152", "#c51b7d", "#de77ae",
-        "#f1b62c", "#fddf17",
-        "#f7ef58", "#e4f541", "#b8e186",
-        "#7fbc41", "#4d9221", "#276419"]);
-
+    .range(urbanityColorRange);
 //  .domain([0, 20,200,1000])
+
+var deathsColorRange = ["#fff5f0", "#aa1017", "#a91016", "#a71016", "#a60f16", "#a40f16", "#a30e15", "#a10e15", "#67000d"];
 var deathsColorScale = d3.scale.linear()
     .domain([0, 900])
-    .range(["#fffdfb", "#6b0015"]);
+    .range(deathsColorRange);
 
 // Map dimensions (in pixels)
 var width = window.innerWidth - 20,
@@ -75,12 +77,25 @@ var legendLinear = d3.legend.color()
     .labelFormat(d3.format(".0f"))
     .shapeWidth(30)
     .cells(10)
-    .title("Inzidenz")
+    .title("Inzidenz pro 100.000 Einwohner")
     .orient('horizontal')
     .scale(deathsColorScale);
 
 svg.select(".legendLinear")
     .call(legendLinear);
+
+var updateLegend = function () {
+    legendLinear = d3.legend.color()
+        .labelFormat(d3.format(".0f"))
+        .shapeWidth(30)
+        .cells(10)
+        .title("Inzidenz pro 100.000 Einwohner")
+        .orient('horizontal')
+        .scale(deathsColorScale);
+
+    svg.select(".legendLinear")
+        .call(legendLinear);
+}
 
 
 //Create zoom/pan listener
@@ -102,6 +117,8 @@ effectController = {
     granularity: "Gemeinde",
     causesOfDeath: "Bösartige Neubildungen",
     year: 2002,
+    domainMin: 0,
+    domainMax: 1000,
     animate: false,
     loop: true,
     causes: new Map()
@@ -137,6 +154,8 @@ var onShowPopulationController = f2.add(effectController, 'showPopulation');
 var onShowCasesController = f2.add(effectController, 'showCases');
 var onGranularityChangeController = f1.add(effectController, 'granularity', ['Gemeinde', /* 'Bezirk' , */ 'Bundesland']).listen();
 var onShowCausesOfDeathController = f1.add(effectController, 'causesOfDeath', causesOfDeathGroups);
+var onDomainMinChangeController = f1.add(effectController, 'domainMin', 0, 500).step(1).listen();
+var onDomainMaxChangeController = f1.add(effectController, 'domainMax', 0, 1000).step(1).listen();
 
 
 var animate = function () {
@@ -172,8 +191,8 @@ let getIncidence = function (d) {
 
     let pop = population[d.properties.iso][year];
     let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
-    let incidence = 100000 * cases / pop
-    // console.log(pop, cases, incidence)
+    let incidence = Math.round(100000 * cases / pop);
+
     return incidence;
 }
 
@@ -224,9 +243,25 @@ var updateColor = function () {
 
 }
 
+onDomainMinChangeController.onChange(function (value) {
+    deathsColorScale = d3.scale.linear()
+        .domain([value, effectController.domainMax])
+        .range(deathsColorRange);
+
+    updateLegend();
+    updateColor();
+});
+onDomainMaxChangeController.onChange(function (value) {
+    deathsColorScale = d3.scale.linear()
+        .domain([effectController.domainMin, value])
+        .range(deathsColorRange);
+
+    updateLegend();
+    updateColor();
+});
 
 onAnimateController.onChange(function (value) {
-    // we have only data on district level
+
     if (value) {
         animate();
     } else {
@@ -253,10 +288,55 @@ onGranularityChangeController.onChange(function (value) {
     }
 });
 
+var updateDomain = function (value) {
+    console.log("update domain")
+
+    value = value || effectController.causesOfDeath;
+
+    if (effectController.granularity === "Gemeinde") {
+        onDomainMinChangeController.setValue(0);
+        onDomainMaxChangeController.setValue(1000);
+        return;
+    }
+
+    let min, max;
+    switch (value) {
+        case causesOfDeathGroups[0]:
+            min = 180;
+            max = 300;
+            break;
+        case causesOfDeathGroups[1]:
+            min = 300;
+            max = 600;
+            break;
+        case causesOfDeathGroups[2]:
+            min = 30;
+            max = 70;
+            break;
+        case causesOfDeathGroups[3]:
+            min = 20;
+            max = 60;
+            break;
+        case causesOfDeathGroups[4]:
+            min = 80;
+            max = 240;
+            break;
+        case causesOfDeathGroups[5]:
+            min = 40;
+            max = 70;
+            break;
+    }
+    onDomainMinChangeController.setValue(min);
+    onDomainMaxChangeController.setValue(max);
+}
+
 function showCauses(value) {
+
     if (value in effectController.causes) {
         console.log(value + " already loaded")
         updateColor();
+        updateDomain(value);
+
         return;
     }
 
@@ -268,6 +348,7 @@ function showCauses(value) {
         effectController.causes[value] = data;
 
         updateColor();
+        updateDomain(value);
     });
 
 }
@@ -291,11 +372,8 @@ onColorUrbanityController.onChange(function (value) {
 
         municipalities.selectAll("path")
             .data(effectController.geofeatures)
-            .attr("fill", d => urbanityColorScale(urbanity.get(d.properties.iso)));
-
-        // show description for urbanity codes
-        municipalities.selectAll("path")
-            .selectAll("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(urbanity.get(d.properties.iso)));
+            .attr("fill", d => urbanityColorScale(urbanity.get(d.properties.iso)))
+            .select("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(urbanity.get(d.properties.iso)));
     } else {
         if (effectController.colorPopulation === false) {
             clearColor();
@@ -310,10 +388,8 @@ onColorPopulationController.onChange(function (value) {
 
         municipalities.selectAll("path")
             .data(effectController.geofeatures)
-            .attr("fill", d => populationColorScale(population[d.properties.iso][Math.floor(effectController.year)]));
-
-        municipalities.selectAll("path")
-            .selectAll("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)]);
+            .attr("fill", d => populationColorScale(population[d.properties.iso][Math.floor(effectController.year)]))
+            .select("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)]);
     } else {
         if (effectController.colorPopulation === false) {
             clearColor();
@@ -341,7 +417,6 @@ onShowPopulationController.onChange(function (value) {
 
     } else if (!effectController.showCases) {
         bubbles.selectAll("circle").attr("r", 0);
-        //effectController.legend.selectAll("*").remove();
     }
 });
 var updateBubbles = function () {
@@ -370,7 +445,6 @@ onShowCasesController.onChange(function (value) {
 
     } else if (!effectController.showPopulation) {
         bubbles.selectAll("circle").attr("r", 0);
-        //effectController.legend.selectAll("*").remove();
     }
 });
 
@@ -394,7 +468,7 @@ d3.json("data/gemeinden_wien_bezirke_topo.json", function (error, geodata) {
         .append("title").text(d => d.properties.name + ": " + urbanityCodeNames.get(effectController.data.get(d.properties.iso)));
 
     // create legend for bubbles
-    // we want to display values between 0 and 2 million
+    // we want to display values between 0 and 300k
     var domain = [0, 300000];
 
     // values are scaled to range 0,32
@@ -431,11 +505,6 @@ d3.json("data/gemeinden_wien_bezirke_topo.json", function (error, geodata) {
         .attr("r", 0).append("title").text("");
 
     showCauses(effectController.causesOfDeath);
-    // start showing district data
-    //showDistricts();
-
-    // show default title
-    //.append("title").text(d => d.properties.name + ": " + effectController.data.get(d.properties.iso));
 });
 
 var showDistricts = function () {
@@ -454,10 +523,10 @@ var showDistricts = function () {
                 .append("path")
                 .attr("d", path)
                 .on("click", clicked)
-               // .append("title").text(d => d.properties.name + ": " + getData(d));
+            // .append("title").text(d => d.properties.name + ": " + getData(d));
 
             // todo: use real data
-           // updateDistricts(districtGeofeatures);
+            // updateDistricts(districtGeofeatures);
         });
     } else {
         // todo: use real data

@@ -1,4 +1,4 @@
-var population, urbanity, urbanityCodeNames, causesOfDeathGroups, causesOfDeath, districtNames;
+var population, urbanity, urbanityCodeNames, causesOfDeathGroups, districtNames;
 
 causesOfDeathGroups = [
     "Bösartige Neubildungen",
