@@ -3,6 +3,7 @@
 var municipalityGeofeatures, districtGeofeatures, stateGeofeatures;
 var bubblesDomainPopulation = [0, 300000];
 var bubblesDomainCases = [0, 1000];
+var oldYear = 2002;
 
 effectController = {
     colorUrbanity: false,
@@ -203,7 +204,10 @@ var animate = function () {
 
     effectController.year += 0.1;
 
-    updateColor();
+    if (Math.floor(effectController.year) != oldYear) {
+        oldYear = effectController.year;
+        updateColor();
+    }
 
     if (effectController.showPopulation) {
         updateBubbles(population, bubblesDomainPopulation);
@@ -301,8 +305,13 @@ onAnimateController.onChange(function (value) {
 onYearChangeController.onChange(function (value) {
     if (value) {
         effectController.year = value;
-        onColorPopulationController.setValue(false);
-        onColorUrbanityController.setValue(false);
+
+        if (effectController.colorUrbanity) {
+            onColorUrbanityController.setValue(false);
+        } else if (effectController.colorPopulation) {
+            onColorPopulationController.setValue(false);
+        }
+
         updateColor();
     }
 });
