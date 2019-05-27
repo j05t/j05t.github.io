@@ -115,8 +115,7 @@ var updateLegend = function () {
 
     svg.select(".legendLinear")
         .call(legendLinear);
-}
-
+};
 
 var updateBubblesLegend = function (domain) {
     bubblesLegend.selectAll("*").remove();
@@ -546,6 +545,101 @@ var showDistricts = function () {
     }
 };
 
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background", "#fff");
+
+var createChart = function (d) {
+    tooltip.selectAll("*").remove();
+
+    let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso];
+    let arrData = [];
+
+    for (let y = 2002; y <= 2017; y++) {
+        arrData.push([y, cases[y]]);
+    }
+
+    // Set the dimensions of the canvas / graph
+    var margin = {top: 10, right: 10, bottom: 20, left: 35},
+        width = 260 - margin.left - margin.right,
+        height = 160 - margin.top - margin.bottom;
+
+    var x = d3.time.scale()
+        .range([0, width])
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var line = d3.svg.line()
+        .x(function (d) {
+            return x(d.year);
+        })
+        .y(function (d) {
+            return y(d.incidence);
+        });
+
+    let svg = tooltip.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    let calcIncidence = function (year, cases) {
+        let pop = population[d.properties.iso][year];
+        return Math.round(100000 * cases / pop);
+    };
+
+    let data = arrData.map(function (d) {
+
+        return {
+            year: d[0],
+            cases: d[1],
+            incidence: calcIncidence(d[0], d[1])
+        };
+
+    });
+
+    x.domain(d3.extent(data, function (d) {
+        return d.year;
+    }));
+    y.domain(d3.extent(data, function (d) {
+        return d.incidence;
+    }));
+
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 2)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Inzidenz / 100.000");
+
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+
+};
 
 var showStates = function () {
 
@@ -562,7 +656,17 @@ var showStates = function () {
                 .append("path")
                 .attr("d", path)
                 .on("click", clicked)
-                .append("title").text(d => d.properties.name + ": " + getData(d));
+                .on("mouseover", function (d) {
+                    createChart(d);
+                    return tooltip.style("visibility", "visible");
+                })
+                .on("mousemove", function () {
+                    return tooltip.style("top", (d3.event.pageY + 40) + "px").style("left", (d3.event.pageX + 10) + "px");
+                })
+                .on("mouseout", function () {
+                    return tooltip.style("visibility", "hidden")
+                })
+                .append("title").text(d => d.properties.name + ": " + getData(d))
 
             updateDomain();
             updateDistricts(stateGeofeatures);
