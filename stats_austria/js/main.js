@@ -210,15 +210,14 @@ var animate = function () {
     } else if (effectController.showCases) {
         updateBubbles(effectController.causes[effectController.causesOfDeath], bubblesDomainCases);
     }
-}
+};
 
 
 let getData = function (d) {
     let year = Math.round(effectController.year);
 
-    //return Math.floor(d.causesOfDeath.get(year)[causesOfDeathGroups.indexOf(effectController.causesOfDeath)]);
     return effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
-}
+};
 let getIncidence = function (d) {
     let year = Math.round(effectController.year);
 
@@ -227,7 +226,7 @@ let getIncidence = function (d) {
     let incidence = Math.round(100000 * cases / pop);
 
     return incidence;
-}
+};
 
 
 let updateDistricts = function (features) {
@@ -250,7 +249,7 @@ let updateDistricts = function (features) {
             .on("click", clicked)
             .select("title").text(d => d.properties.name + ": " + getIncidence(d));
     }
-}
+};
 
 // show causes of death data here
 var updateColor = function () {
@@ -271,7 +270,7 @@ var updateColor = function () {
         updateDistricts(districtGeofeatures);
     }
 
-}
+};
 
 onDomainMinChangeController.onChange(function (value) {
     deathsColorScale = d3.scale.linear()
@@ -302,6 +301,8 @@ onAnimateController.onChange(function (value) {
 onYearChangeController.onChange(function (value) {
     if (value) {
         effectController.year = value;
+        onColorPopulationController.setValue(false);
+        onColorUrbanityController.setValue(false);
         updateColor();
     }
 });
@@ -314,6 +315,8 @@ onGranularityChangeController.onChange(function (value) {
             showDistricts();
         } else if (value === "Bundesland") {
             showStates();
+        } else {
+            updateDomain();
         }
     }
 });
@@ -358,9 +361,9 @@ var updateDomain = function (value) {
     }
     onDomainMinChangeController.setValue(min);
     onDomainMaxChangeController.setValue(max);
-}
+};
 
-function showCauses(value) {
+var showCauses = function (value) {
 
     if (value in effectController.causes) {
         console.log(value + " already loaded")
@@ -380,8 +383,7 @@ function showCauses(value) {
         updateColor();
         updateDomain(value);
     });
-
-}
+};
 
 onShowCausesOfDeathController.onChange(function (value) {
     if (value) {
@@ -394,7 +396,7 @@ var clearColor = function () {
     municipalities.selectAll("path")
         .data(municipalityGeofeatures)
         .attr("fill", "#cfcfcf");
-}
+};
 
 onColorUrbanityController.onChange(function (value) {
     if (value) {
@@ -407,6 +409,7 @@ onColorUrbanityController.onChange(function (value) {
     } else {
         if (effectController.colorPopulation === false) {
             clearColor();
+            updateColor();
         }
     }
 });
@@ -423,6 +426,7 @@ onColorPopulationController.onChange(function (value) {
     } else {
         if (effectController.colorPopulation === false) {
             clearColor();
+            updateColor();
         }
     }
 });
@@ -502,6 +506,8 @@ d3.json("data/gemeinden_wien_bezirke_topo.json", function (error, geodata) {
         .attr("r", 0).append("title").text("");
 
     showCauses(effectController.causesOfDeath);
+
+    onGranularityChangeController.setValue("Bundesland");
 });
 
 var showDistricts = function () {
@@ -529,7 +535,7 @@ var showDistricts = function () {
         // todo: use real data
         // updateDistricts(districtGeofeatures);
     }
-}
+};
 
 
 var showStates = function () {
@@ -549,20 +555,23 @@ var showStates = function () {
                 .on("click", clicked)
                 .append("title").text(d => d.properties.name + ": " + getData(d));
 
+            updateDomain();
             updateDistricts(stateGeofeatures);
+
         });
     } else {
+        updateDomain();
         updateDistricts(stateGeofeatures);
     }
-}
+};
 
 
 // Add optional onClick events for municipalities here
 // d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
-function clicked(d, i) {
+var clicked = function (d, i) {
     console.log(d.properties.name, d.properties.iso);
     console.log("index: " + i);
-}
+};
 
 
 // Update map on zoom/pan
@@ -573,4 +582,4 @@ function zoomed() {
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
     bubbles.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
-}
+};
