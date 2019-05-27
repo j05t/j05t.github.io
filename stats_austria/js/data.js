@@ -22,12 +22,12 @@ urbanityCodeNames = new Map([
     [103, "Urbane Kleinzentren"],
     [210, "Regionale Zentren, zentral"],
     [220, "Regionale Zentren, intermediar"],
-    [310, "Laendlicher Raum im Umland von Zentren, zentral"],
-    [320, "Laendlicher Raum im Umland von Zentren, intermediaer"],
-    [330, "Laendlicher Raum im Umland von Zentren, periphaer"],
-    [410, "Laendlicher Raum, zentral"],
-    [420, "Laendlicher Raum, intermediaer"],
-    [430, "Laendlicher Raum, periphaer"]
+    [310, "Ländlicher Raum im Umland von Zentren, zentral"],
+    [320, "Ländlicher Raum im Umland von Zentren, intermediär"],
+    [330, "Ländlicher Raum im Umland von Zentren, periphär"],
+    [410, "Ländlicher Raum, zentral"],
+    [420, "Ländlicher Raum, intermediär"],
+    [430, "Ländlicher Raum, periphär"]
 ]);
 urbanity = new Map([
     [10101, 103],
