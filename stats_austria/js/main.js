@@ -553,6 +553,7 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden")
     .style("background", "#fff");
 
+
 var createChart = function (d) {
     tooltip.selectAll("*").remove();
 
@@ -564,9 +565,9 @@ var createChart = function (d) {
     }
 
     // Set the dimensions of the canvas / graph
-    var margin = {top: 10, right: 10, bottom: 20, left: 35},
-        width = 260 - margin.left - margin.right,
-        height = 160 - margin.top - margin.bottom;
+    var margin = {top: 5, right: 10, bottom: 20, left: 35},
+        width = 240 - margin.left - margin.right,
+        height = 150 - margin.top - margin.bottom;
 
     var x = d3.time.scale()
         .range([0, width])
@@ -589,6 +590,9 @@ var createChart = function (d) {
         .y(function (d) {
             return y(d.incidence);
         });
+
+    tooltip.append("p")
+        .text(d.properties.name);
 
     let svg = tooltip.append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -617,7 +621,6 @@ var createChart = function (d) {
     y.domain(d3.extent(data, function (d) {
         return d.incidence;
     }));
-
 
     svg.append("g")
         .attr("class", "x axis")
@@ -661,12 +664,11 @@ var showStates = function () {
                     return tooltip.style("visibility", "visible");
                 })
                 .on("mousemove", function () {
-                    return tooltip.style("top", (d3.event.pageY + 40) + "px").style("left", (d3.event.pageX + 10) + "px");
+                    return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 10) + "px");
                 })
                 .on("mouseout", function () {
                     return tooltip.style("visibility", "hidden")
-                })
-                .append("title").text(d => d.properties.name + ": " + getData(d))
+                });
 
             updateDomain();
             updateDistricts(stateGeofeatures);
