@@ -167,12 +167,12 @@ var bubblesLegend = svg.append("g")
 // construct GUI and assign callback functions
 var gui = new dat.GUI();
 
-var f1 = gui.addFolder('Coloring');
+var f1 = gui.addFolder('Farbe');
 var onColorUrbanityController = f1.add(effectController, 'colorUrbanity');
 var onColorPopulationController = f1.add(effectController, 'colorPopulation');
 f1.open();
 
-var f2 = gui.addFolder('Detailed Information');
+var f2 = gui.addFolder('Details');
 
 var f3 = gui.addFolder("Animation");
 f3.open();
