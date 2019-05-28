@@ -203,7 +203,7 @@ var animate = function () {
 
     effectController.year += 0.1;
 
-    if (Math.floor(effectController.year) != oldYear) {
+    if (Math.floor(effectController.year) !== oldYear) {
         oldYear = effectController.year;
         updateColor();
     }
@@ -226,9 +226,7 @@ let getIncidence = function (d) {
 
     let pop = population[d.properties.iso][year];
     let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
-    let incidence = Math.round(100000 * cases / pop);
-
-    return incidence;
+    return Math.round(100000 * cases / pop);
 };
 
 
@@ -242,15 +240,35 @@ let updateDistricts = function (features) {
             .attr("d", path)
             .attr("fill", d => deathsColorScale(getIncidence(d)))
             .on("click", clicked)
-            .append("title").text(d => d.properties.name + ": " + getIncidence(d));
+            .on("mouseover", function (d) {
+                createChart(d);
+                return tooltip.style("visibility", "visible");
+            })
+            .on("mousemove", function () {
+                return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 15) + "px");
+            })
+            .on("mouseout", function () {
+                return tooltip.style("visibility", "hidden")
+            });
+        //.append("title").text(d => d.properties.name + ": " + getIncidence(d));
+
     } else {
         // update for each map feature in the data
         districts.selectAll("path")
             .data(features)
-            .attr("d", path)
             .attr("fill", d => deathsColorScale(getIncidence(d)))
             .on("click", clicked)
-            .select("title").text(d => d.properties.name + ": " + getIncidence(d));
+            .on("mouseover", function (d) {
+                createChart(d);
+                return tooltip.style("visibility", "visible");
+            })
+            .on("mousemove", function () {
+                return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 15) + "px");
+            })
+            .on("mouseout", function () {
+                return tooltip.style("visibility", "hidden")
+            });
+        //.select("title").text(d => d.properties.name + ": " + getIncidence(d));
     }
 };
 
@@ -555,6 +573,7 @@ var tooltip = d3.select("body")
 
 
 var createChart = function (d) {
+
     tooltip.selectAll("*").remove();
 
     let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso];
@@ -565,25 +584,25 @@ var createChart = function (d) {
     }
 
     // Set the dimensions of the canvas / graph
-    var margin = {top: 5, right: 10, bottom: 20, left: 35},
+    let margin = {top: 5, right: 10, bottom: 20, left: 35},
         width = 240 - margin.left - margin.right,
         height = 150 - margin.top - margin.bottom;
 
-    var x = d3.time.scale()
+    let x = d3.time.scale()
         .range([0, width])
 
-    var y = d3.scale.linear()
+    let y = d3.scale.linear()
         .range([height, 0]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
 
-    var yAxis = d3.svg.axis()
+    let yAxis = d3.svg.axis()
         .scale(y)
         .orient("left");
 
-    var line = d3.svg.line()
+    let line = d3.svg.line()
         .x(function (d) {
             return x(d.year);
         })
@@ -618,9 +637,16 @@ var createChart = function (d) {
     x.domain(d3.extent(data, function (d) {
         return d.year;
     }));
+
     y.domain(d3.extent(data, function (d) {
         return d.incidence;
     }));
+
+/* use zero origin
+   y.domain([0, d3.max(data, function (d) {
+       return d.incidence;
+   })]);
+*/
 
     svg.append("g")
         .attr("class", "x axis")
@@ -642,7 +668,16 @@ var createChart = function (d) {
         .attr("class", "line")
         .attr("d", line);
 
+    // indicate currently shown data point
+    let currentYear = Math.floor(effectController.year);
+    let incidence = calcIncidence(currentYear, cases[currentYear]);
+    svg.append("circle")
+        .attr("fill", "red")
+        .attr("r", 3)
+        .attr("cx", x(currentYear))
+        .attr("cy", y(incidence));
 };
+
 
 var showStates = function () {
 
@@ -652,23 +687,6 @@ var showStates = function () {
 
             //generate municipalities from TopoJSON
             stateGeofeatures = topojson.feature(geodata, geodata.objects.laender).features;
-
-            districts.selectAll("path")
-                .data(stateGeofeatures)
-                .enter()
-                .append("path")
-                .attr("d", path)
-                .on("click", clicked)
-                .on("mouseover", function (d) {
-                    createChart(d);
-                    return tooltip.style("visibility", "visible");
-                })
-                .on("mousemove", function () {
-                    return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 10) + "px");
-                })
-                .on("mouseout", function () {
-                    return tooltip.style("visibility", "hidden")
-                });
 
             updateDomain();
             updateDistricts(stateGeofeatures);
