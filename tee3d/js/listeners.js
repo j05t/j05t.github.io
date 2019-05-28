@@ -83,7 +83,8 @@ document.getElementById('zfff').addEventListener('click', function () {
     head.material.color = new THREE.Color(0xffffff);
 });
 
-// firefox
+
 document.body.onload = function () {
+    updateLanguage();
     changeText(engravingText);
 };

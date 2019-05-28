@@ -46,6 +46,9 @@ var white2transparent = function (img) {
 }
 
 var tee3dpreview = function () {
+    // en / de
+    let language = document.children[0].lang;
+
     // send to tee3d
     var form = document.createElement("form");
     form.setAttribute("method", "post");
@@ -54,6 +57,7 @@ var tee3dpreview = function () {
     form.setAttribute("target", "view");
 
     var hiddenField = document.createElement("input");
+    var langField = document.createElement("input");
 
     var imgData;
 
@@ -76,7 +80,14 @@ var tee3dpreview = function () {
             hiddenField.setAttribute("type", "hidden");
             hiddenField.setAttribute("name", "message");
             hiddenField.setAttribute("value", imgData);
+
+            langField.setAttribute("type", "hidden");
+            langField.setAttribute("name", "lang");
+            langField.setAttribute("value", language);
+
             form.appendChild(hiddenField);
+            form.appendChild(langField);
+
             document.body.appendChild(form);
 
             window.open('', 'view');
@@ -97,7 +108,7 @@ var tee3dpreview = function () {
 
 ////////////////////////////////////////////////////////////////
 // download button
-
+/*
 // hide background images
 fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 0;
 fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0;
@@ -112,3 +123,4 @@ fancyProductDesigner.getViewsDataURL(function (dataURLs) {
 fancyProductDesigner.viewInstances[0].getElementByTitle("tee").opacity = 1;
 fancyProductDesigner.viewInstances[0].getElementByTitle("box up").opacity = 0.5;
 fancyProductDesigner.viewInstances[0].getElementByTitle("bg").opacity = 1;
+*/

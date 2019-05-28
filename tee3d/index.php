@@ -19,7 +19,6 @@
 <script src="js/main.js"></script>
 
 <script>
-
     logo = new Image();
 
     function sleep(ms) {
@@ -52,6 +51,10 @@
         }
 
         logo.src = "<?php print($_POST['message']) ?>";
+    <?php endif ?>
+
+    <?php if ( !empty($_POST['lang']) ): ?>
+        language = "<?php print($_POST['lang']) ?>";
     <?php endif ?>
 
 </script>

@@ -1,5 +1,8 @@
 var backgroundImage = "img/background.jpg";
 
+var language = navigator.language || navigator.userLanguage;
+
+
 var tee, head, wood, controls, baseHead;
 var rotate = true;
 
@@ -17,6 +20,12 @@ var tiltedView = new THREE.Vector3(10, 14, 2);
 var textView = new THREE.Vector3(14, 7, 11);
 
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
+
+
+// todo: implement
+var updateLanguage = function() {
+
+};
 
 // reset trackball controls to original position
 var resetControls = function () {
