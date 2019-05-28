@@ -8,7 +8,7 @@ var rotate = true;
 
 var basePosition = new THREE.Vector3(110, 0, 0);
 
-var engravingText = "Engraving";
+var engravingText = "EDELRASTER";
 var showEngraving = true;
 
 var oldPos;
@@ -24,6 +24,16 @@ var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
 
 // todo: implement
 var updateLanguage = function() {
+
+    console.log("updateLanguage()");
+
+    let l = language.substring(0,1);
+
+    if (l === "de") {
+
+    } else {
+
+    }
 
 };
 

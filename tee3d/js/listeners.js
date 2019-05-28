@@ -56,7 +56,6 @@ document.getElementById('engravingText').addEventListener('focus', function () {
 
 document.getElementById('engravingText').addEventListener('focusout', function () {
     rotate = true;
-    moveAndLookAt(oldPos, lookAt, 500);
 });
 
 
