@@ -250,7 +250,6 @@ let updateDistricts = function (features) {
             .on("mouseout", function () {
                 return tooltip.style("visibility", "hidden")
             });
-        //.append("title").text(d => d.properties.name + ": " + getIncidence(d));
 
     } else {
         // update for each map feature in the data
@@ -268,7 +267,6 @@ let updateDistricts = function (features) {
             .on("mouseout", function () {
                 return tooltip.style("visibility", "hidden")
             });
-        //.select("title").text(d => d.properties.name + ": " + getIncidence(d));
     }
 };
 
@@ -277,7 +275,7 @@ var updateColor = function () {
     municipalities.selectAll("path")
         .data(municipalityGeofeatures)
         .attr("fill", d => deathsColorScale(getIncidence(d)))
-        .select("title").text(d => d.properties.name + ": " + getIncidence(d));
+        .select("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)] + " Einwohner\n" + getData(d) + " Fälle, Inzidenz " + getIncidence(d));
 
     if (effectController.showPopulation) {
         updateBubbles(population, bubblesDomainPopulation);
@@ -448,7 +446,7 @@ onColorPopulationController.onChange(function (value) {
         municipalities.selectAll("path")
             .data(municipalityGeofeatures)
             .attr("fill", d => populationColorScale(population[d.properties.iso][Math.floor(effectController.year)]))
-            .select("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)]);
+            .select("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)] + " Einwohner");
     } else {
         if (effectController.colorPopulation === false) {
             clearColor();
@@ -462,14 +460,15 @@ var updateBubbles = function (data, domain) {
     let year = Math.round(effectController.year);
 
     // values are scaled to range 0, 24
-    var radius = d3.scale.sqrt().domain(domain).range([0, 24]);
+    let radius = d3.scale.sqrt().domain(domain).range([0, 24]);
 
+    let desc = effectController.showPopulation ? " Einwohner" : " Fälle";
 
     // update circle for each map feature in the data
     bubbles.selectAll("circle")
         .data(municipalityGeofeatures)
         .attr("r", d => radius(data[d.properties.iso][Math.floor(year)]))
-        .select("title").text(d => d.properties.name + ": " + data[d.properties.iso][Math.floor(year)]);
+        .select("title").text(d => d.properties.name + ": " + data[d.properties.iso][Math.floor(year)] + desc);
 };
 
 onShowPopulationController.onChange(function (value) {
