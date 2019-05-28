@@ -362,15 +362,15 @@ var updateDomain = function (value) {
     switch (value) {
         case causesOfDeathGroups[0]:
             min = 180;
-            max = 300;
+            max = 290;
             break;
         case causesOfDeathGroups[1]:
-            min = 300;
-            max = 600;
+            min = 270;
+            max = 550;
             break;
         case causesOfDeathGroups[2]:
             min = 30;
-            max = 70;
+            max = 75;
             break;
         case causesOfDeathGroups[3]:
             min = 20;
@@ -381,7 +381,7 @@ var updateDomain = function (value) {
             max = 240;
             break;
         case causesOfDeathGroups[5]:
-            min = 40;
+            min = 35;
             max = 70;
             break;
     }
@@ -642,11 +642,11 @@ var createChart = function (d) {
         return d.incidence;
     }));
 
-/* use zero origin
-   y.domain([0, d3.max(data, function (d) {
-       return d.incidence;
-   })]);
-*/
+    /* use zero origin
+       y.domain([0, d3.max(data, function (d) {
+           return d.incidence;
+       })]);
+    */
 
     svg.append("g")
         .attr("class", "x axis")
