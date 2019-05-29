@@ -196,7 +196,7 @@ var animate = function () {
     }
 
     if (effectController.animate && effectController.year < 2017) {
-        requestAnimationFrame(animate, 500);
+        requestAnimationFrame(animate);
     } else {
         onAnimateController.setValue(false);
     }
@@ -217,15 +217,15 @@ var animate = function () {
 
 
 let getData = function (d) {
-    let year = Math.round(effectController.year);
+    let year = Math.floor(effectController.year);
 
-    return effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
+    return effectController.causes[effectController.causesOfDeath][d.properties.iso][year];
 };
 let getIncidence = function (d) {
-    let year = Math.round(effectController.year);
+    let year = Math.floor(effectController.year);
 
     let pop = population[d.properties.iso][year];
-    let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso][Math.floor(year)];
+    let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso][year];
     return Math.round(100000 * cases / pop);
 };
 
@@ -457,7 +457,7 @@ onColorPopulationController.onChange(function (value) {
 
 var updateBubbles = function (data, domain) {
 
-    let year = Math.round(effectController.year);
+    let year = Math.floor(effectController.year);
 
     // values are scaled to range 0, 24
     let radius = d3.scale.sqrt().domain(domain).range([0, 24]);
@@ -467,8 +467,8 @@ var updateBubbles = function (data, domain) {
     // update circle for each map feature in the data
     bubbles.selectAll("circle")
         .data(municipalityGeofeatures)
-        .attr("r", d => radius(data[d.properties.iso][Math.floor(year)]))
-        .select("title").text(d => d.properties.name + ": " + data[d.properties.iso][Math.floor(year)] + desc);
+        .attr("r", d => radius(data[d.properties.iso][year]))
+        .select("title").text(d => d.properties.name + ": " + data[d.properties.iso][year] + desc);
 };
 
 onShowPopulationController.onChange(function (value) {
