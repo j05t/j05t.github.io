@@ -11,11 +11,16 @@
 
 <body>
 
+
+<!-- libs minified and combined
 <script src="js/three.min.js"></script>
 <script src='js/threex.dynamictexture.js'></script>
 <script src="js/ColladaLoader.js"></script>
 <script src="js/TrackballControls.js"></script>
 <script src="js/Tween.js"></script>
+-->
+<script src="js/libs.js"></script>
+
 <script src="js/main.js"></script>
 
 <script>
