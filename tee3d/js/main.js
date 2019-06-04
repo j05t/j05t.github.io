@@ -16,8 +16,8 @@ var oldPos;
 
 var lookAt = new THREE.Vector3(0, 0, 0);
 var headView = new THREE.Vector3(0.01, 20, 0.1);
-var sideView = new THREE.Vector3(20, 20, 2);
-var tiltedView = new THREE.Vector3(10, 14, 2);
+var sideView = new THREE.Vector3(20, 23, 2);
+var tiltedView = new THREE.Vector3(12.4, 17.4, 3.4);
 var textView = new THREE.Vector3(14, 7, 11);
 
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
@@ -144,7 +144,7 @@ document.body.appendChild(renderer.domElement);
 // transform camera to default view
 camera.position.set(sideView.x, sideView.y, sideView.z);
 
-camera.lookAt(new THREE.Vector3(0, 0, 0));
+camera.lookAt(lookAt);
 
 // add hemisphere light
 var hemLight = new THREE.HemisphereLight(0xffffff, 0x080820, .42);
