@@ -1,5 +1,3 @@
-"use strict";
-
 // setup sidebar menu onclick handlers
 document.getElementById('head').addEventListener('click', function () {
     resetControls();
