@@ -33,7 +33,7 @@
             await sleep(500);
             console.log("slept 500ms");
         }
-        // set and scale texture
+        // set, scale and update logo texture
         baseHead.material.map.image = logo;
         baseHead.material.map.repeat.set(0.8,0.8);
         baseHead.material.map.offset.set(0.1,0.1);
