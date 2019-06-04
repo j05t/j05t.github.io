@@ -1,12 +1,7 @@
-// onclick handler installed at customizer/catalog/view/javascript/fancy_design/FancyProductDesigner-all.min.js
+// onclick handler for preview button installed at
+// customizer/catalog/view/javascript/fancy_design/FancyProductDesigner-all.min.js
 
-// 		else if(action === 'preview-lightbox') {
-//
-//			tee3dpreview();
-//
-//		}
-
-// send to 3d preview button
+// prepare image and send to 3d preview button
 // https://stackoverflow.com/questions/6755314/canvas-imagedata-remove-white-pixels
 var white2transparent = function (img) {
     var c = document.createElement('canvas');

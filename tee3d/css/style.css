@@ -12,11 +12,11 @@ canvas {
 
 a, a:visited {
     text-decoration: none;
-    color: #000000;
+    color: #777777;
 }
 
 a:hover {
-    color: #5b5b5b;
+    color: #C1AA64;
 }
 
 #visuplan {
@@ -196,6 +196,7 @@ body {
 }
 
 #teeDescription {
+    margin-top: 26px;
     height: fit-content;
     background: aliceblue;
     font-size: 14px;
@@ -207,7 +208,7 @@ body {
 }
 
 #engravedBy > img {
-    width: 112px;
+    width: 120px;
 }
 
 .nobr {

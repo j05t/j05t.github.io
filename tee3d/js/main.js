@@ -6,7 +6,7 @@ var language = navigator.language || navigator.userLanguage;
 var tee, head, wood, controls, baseHead;
 var rotate = true;
 
-var basePosition = new THREE.Vector3(110, 0, 0);
+var basePosition = new THREE.Vector3(50, 0, 0);
 
 var engravingText = "EDELRASTER";
 var showEngraving = true;
@@ -22,18 +22,27 @@ var textView = new THREE.Vector3(14, 7, 11);
 var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
 
 
-// todo: implement
-var updateLanguage = function() {
+var updateLanguage = function () {
 
-    console.log("updateLanguage()");
+    let l = language.substring(0, 2);
+    console.log("detected language " + l);
 
-    let l = language.substring(0,1);
-
-    if (l === "de") {
-
-    } else {
-
+    if (l !== "de") {
+        return;
     }
+
+    let descGerman = 'Hinweis: Dies ist nur eine Illustration!<br/><br/>Sie können das Tee mit gedrückter linker Maustaste im Raum bewegen. Durch Scrollen mit dem Mausrad ist der Zoom verfügbar. Jedes Mal, wenn Sie auf eine Menüansicht klicken, wird sich das T-Stück neu zentrieren. Die Gravur kann einfach durch Hinzufügen von Text (max. 18 Zeichen) in das Beschriftungsfeld aktiviert werden. Sie kehren zum TWiNTEE-Customizer zurück, indem Sie die Registerkarte in Ihrem Browser schließen.<br/><br/>- entwickelt von TWiNTEE.golf -';
+    let headGerman = "Kopfansicht", sideGerman = "Seitenansicht";
+    let colors = new Map([["z000", "Schwarz"], ["z3BD23D", "Grün"], ["z1295D8", "Blau"], ["ze4e83b", "Gelb"], ["zfff", "Weiß"]]);
+
+    document.getElementById("head").innerText = headGerman;
+    document.getElementById("side").innerText = sideGerman;
+    document.getElementById("engraving").innerText = "Beschriftung";
+    document.getElementById("teeDescription").innerHTML = descGerman;
+
+    colors.forEach(function (value, color) {
+        document.getElementById(color).title = value;
+    });
 
 };
 
