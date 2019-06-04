@@ -19,8 +19,8 @@
     async function changeLogo() {
         // wait until model is loaded
         while( (typeof baseHead == 'undefined') || !logo.complete) {
-            await sleep(500);
-            console.log("slept 500ms");
+            await sleep(60);
+            console.log("slept 60ms");
         }
         // set, scale and update logo texture
         baseHead.material.map.image = logo;
