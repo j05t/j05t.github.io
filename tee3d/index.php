@@ -11,34 +11,6 @@
 
 <body>
 
-<script>
-    logo = new Image();
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    async function changeLogo() {
-        // wait until model is loaded
-        while( (typeof baseHead == 'undefined') || !logo.complete) {
-            await sleep(500);
-            console.log("slept 500ms");
-        }
-        // set, scale and update logo texture
-        baseHead.material.map.image = logo;
-        baseHead.material.map.repeat.set(0.8,0.8);
-        baseHead.material.map.offset.set(0.1,0.1);
-        baseHead.material.map.needsUpdate = true;
-    }
-    <?php if ( !empty($_POST['message']) ): ?>
-        console.log("got image via POST request");
-        logo.onload = function() {
-          changeLogo();
-        }
-        logo.src = "<?php print($_POST['message']) ?>";
-    <?php endif ?>
-    <?php if ( !empty($_POST['lang']) ): ?>
-        language = "<?php print($_POST['lang']) ?>";
-    <?php endif ?>
-</script>
 
 <!-- nav and corresponding css modified from https://codepen.io/erikterwan/pen/EVzeRP -->
 <!--    Made by Erik Terwan    -->
@@ -135,6 +107,37 @@
 <script src="js/Tween.js"></script>
 -->
 <script src="js/libs.js"></script>
+
+<script>
+    "use strict";
+
+    logo = new Image();
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function changeLogo() {
+        // wait until model is loaded
+        while( (typeof baseHead == 'undefined') || !logo.complete) {
+            await sleep(500);
+            console.log("slept 500ms");
+        }
+        // set, scale and update logo texture
+        baseHead.material.map.image = logo;
+        baseHead.material.map.repeat.set(0.8,0.8);
+        baseHead.material.map.offset.set(0.1,0.1);
+        baseHead.material.map.needsUpdate = true;
+    }
+    <?php if ( !empty($_POST['message']) ): ?>
+        console.log("got image via POST request");
+        logo.onload = function() {
+          changeLogo();
+        }
+        logo.src = "<?php print($_POST['message']) ?>";
+    <?php endif ?>
+    <?php if ( !empty($_POST['lang']) ): ?>
+        language = "<?php print($_POST['lang']) ?>";
+    <?php endif ?>
+</script>
 
 <script src="js/main.js"></script>
 <script src="js/listeners.js"></script>

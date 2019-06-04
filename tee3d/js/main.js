@@ -1,3 +1,5 @@
+"use strict";
+
 var backgroundImage = "img/background.jpg";
 
 var language = navigator.language || navigator.userLanguage;
@@ -83,14 +85,12 @@ function changeText(text) {
     dynamicTexture.context.rotate(270 * Math.PI / 180);
 
     // center text on canvas
-    var textSize = dynamicTexture.context.measureText(text);
-    var x = (-350 - textSize.width) / 2;
-
+    let textSize = dynamicTexture.context.measureText(text);
+    let x = (-350 - textSize.width) / 2;
 
     //                             + ^v -  <>
     //dynamicTexture.drawText(text, -400, 230, '0x0d0d0d');
     dynamicTexture.drawText(text, x, 230, '#582813');
-
 
     dynamicTexture.context.restore();
 
@@ -111,7 +111,7 @@ function onWindowResize() {
 }
 
 function getSpotlight(color, intensity) {
-    var light = new THREE.SpotLight(color, intensity);
+    let light = new THREE.SpotLight(color, intensity);
     light.castShadow = true;
 
     light.shadow.mapSize.x = 4096;
@@ -123,7 +123,8 @@ function getSpotlight(color, intensity) {
 
 // construct scene and add background image
 var scene = new THREE.Scene();
-bgTexture = (new THREE.TextureLoader()).load(backgroundImage);
+
+var bgTexture = (new THREE.TextureLoader()).load(backgroundImage);
 
 scene.background = bgTexture;
 bgTexture.wrapS = THREE.MirroredRepeatWrapping;
@@ -184,7 +185,7 @@ spotLight_04.position.z = -20;
     tee = collada.scene;
 
     tee.rotation.z = Math.PI;
-    tee.position = basePosition;
+    //tee.position.set(basePosition.x, basePosition.y, basePosition.z);
 
     wood = tee.children[0];
     head = tee.children[1];
@@ -278,12 +279,12 @@ function moveAndLookAt(dstpos, dstlookat, duration) {
 
     // rotation (using slerp)
     (function () {
-        var qa = qa = new THREE.Quaternion().copy(camera.quaternion); // src quaternion
+        var qa = new THREE.Quaternion().copy(camera.quaternion); // src quaternion
         var qb = new THREE.Quaternion().setFromEuler(dstrot); // dst quaternion
         var qm = new THREE.Quaternion();
-        camera.quaternion = qm;
+        camera.quaternion.set(qm);
 
-        var o = {t: 0};
+        let o = {t: 0};
         new TWEEN.Tween(o).to({t: 1}, duration).onUpdate(function () {
             THREE.Quaternion.slerp(qa, qb, qm, o.t);
             camera.quaternion.set(qm.x, qm.y, qm.z, qm.w);
@@ -292,13 +293,12 @@ function moveAndLookAt(dstpos, dstlookat, duration) {
 }
 
 function downloadURI(uri, name) {
-    var link = document.createElement("a");
+    let link = document.createElement("a");
     link.download = name;
     link.href = uri;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    delete link;
 }
 
 var render = function (time) {
