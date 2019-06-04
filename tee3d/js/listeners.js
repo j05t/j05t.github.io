@@ -33,6 +33,10 @@ document.getElementById('engraving').addEventListener('click', function () {
     }
 });
 
+document.getElementById('screenshot').addEventListener('click', function () {
+    getScreenshot = true;
+});
+
 document.getElementById('engravingText').addEventListener('keyup', function () {
     engravingText = this.value;
     changeText(engravingText);

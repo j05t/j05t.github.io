@@ -10,6 +10,7 @@ var basePosition = new THREE.Vector3(50, 0, 0);
 
 var engravingText = "EDELRASTER";
 var showEngraving = true;
+var getScreenshot = false;
 
 var oldPos;
 
@@ -292,6 +293,15 @@ function moveAndLookAt(dstpos, dstlookat, duration) {
     }).call(this);
 }
 
+function downloadURI(uri, name) {
+    var link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    delete link;
+}
 
 var render = function (time) {
 
@@ -305,8 +315,16 @@ var render = function (time) {
     if (typeof tee !== 'undefined' && rotate) {
         tee.rotation.z += 0.00142;
     }
-    renderer.render(scene, camera);
-};
 
+    renderer.render(scene, camera);
+
+    if (getScreenshot === true) {
+        let imgData = renderer.domElement.toDataURL();
+        getScreenshot = false;
+
+        downloadURI(imgData, "TWiNTEE.png");
+    }
+
+};
 
 requestAnimationFrame(render);

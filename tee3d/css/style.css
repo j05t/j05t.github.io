@@ -42,7 +42,7 @@ hr {
     border-top: 1px solid #ccc;
 }
 
-#icon_visibility {
+.icon {
     margin-top: -6px;
     margin-right: 6px;
     float: left;
@@ -50,10 +50,16 @@ hr {
 
 .icon_visible {
     background-image: url("img/visible.png");
+    margin-top: -6px;
+    margin-right: 6px;
+    float: left;
 }
 
 .icon_invisible {
     background-image: url("img/invisible.png");
+    margin-top: -6px;
+    margin-right: 6px;
+    float: left;
 }
 
 body {

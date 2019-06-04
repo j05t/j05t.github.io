@@ -80,8 +80,13 @@
             <li><a id="tilted" href="#">3D Illustration</a></li>
 
             <li>
-                <img id="icon_visibility" src="css/img/visible.png" width="32" height="32" alt="Visibility Icon" />
+                <img id="icon_visibility" class="icon" src="css/img/visible.png" width="32" height="32" alt="Visibility Icon" />
                 <a id="engraving" href="#">Inscription</a>
+            </li>
+
+            <li>
+                <img class="icon" src="img/screenshot.png" width="32" height="32" alt="Screenshot Icon"/>
+                <a id="screenshot" href="#">Screenshot</a>
             </li>
 
             <li>
