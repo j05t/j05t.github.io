@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>TWinTEE | 3Dpreview</title>
+    <title>TWiNTEE | 3Dpreview</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -10,17 +10,6 @@
 
 
 <body>
-
-<!-- libs minified and combined
-<script src="js/three.min.js"></script>
-<script src='js/threex.dynamictexture.js'></script>
-<script src="js/ColladaLoader.js"></script>
-<script src="js/TrackballControls.js"></script>
-<script src="js/Tween.js"></script>
--->
-<script src="js/libs.js"></script>
-
-<script src="js/main.js"></script>
 
 <script>
     logo = new Image();
@@ -137,6 +126,17 @@
     <hr/>
 </div>
 
+
+<!-- libs minified and combined
+<script src="js/three.min.js"></script>
+<script src='js/threex.dynamictexture.js'></script>
+<script src="js/ColladaLoader.js"></script>
+<script src="js/TrackballControls.js"></script>
+<script src="js/Tween.js"></script>
+-->
+<script src="js/libs.js"></script>
+
+<script src="js/main.js"></script>
 <script src="js/listeners.js"></script>
 
 </body>

@@ -123,8 +123,7 @@ function getSpotlight(color, intensity) {
 
 // construct scene and add background image
 var scene = new THREE.Scene();
-loader = new THREE.TextureLoader();
-bgTexture = loader.load(backgroundImage);
+bgTexture = (new THREE.TextureLoader()).load(backgroundImage);
 
 scene.background = bgTexture;
 bgTexture.wrapS = THREE.MirroredRepeatWrapping;
@@ -180,8 +179,7 @@ spotLight_04.position.y = 15;
 spotLight_04.position.z = -20;
 
 
-loader = new THREE.ColladaLoader();
-loader.load('model/tee.dae', function (collada) {
+(new THREE.ColladaLoader()).load('model/tee.dae', function (collada) {
     collada.scene.scale.set(8, 8, 8);
     tee = collada.scene;
 
@@ -196,7 +194,7 @@ loader.load('model/tee.dae', function (collada) {
     wood.castShadow = true;
     wood.receiveShadow = true;
 
-    // do not load default texture
+    // do not use default texture for tee head
     head.material.map = null;
 
     wood.material.map = dynamicTexture.texture;
@@ -204,17 +202,14 @@ loader.load('model/tee.dae', function (collada) {
     // load base texture and set default engraving text
     changeText(engravingText);
 
-    scene.add(tee);
-
 
     // load logo with transparency on top of head mesh so that changing the diffuse color
     // of the head mesh does not change the color of the logo itself
-    loader = new THREE.TextureLoader();
-    h2texture = loader.load("model/logo.png", function (texture) {
-        var baseHeadgeometry = head.geometry;
+    (new THREE.TextureLoader()).load("model/logo.png", function (texture) {
+        let baseHeadgeometry = head.geometry;
 
         // set transparent : true and depthWrite : false to only show logo
-        var baseHeadMaterial = new THREE.MeshPhongMaterial({map: texture, transparent: true, depthWrite: false});
+        let baseHeadMaterial = new THREE.MeshPhongMaterial({map: texture, transparent: true, depthWrite: false});
         baseHead = new THREE.Mesh(baseHeadgeometry, baseHeadMaterial);
 
         // scale texture
@@ -222,6 +217,9 @@ loader.load('model/tee.dae', function (collada) {
         baseHead.material.map.offset.set(0.1, 0.1);
 
         head.add(baseHead);
+
+        // model is now fully loaded, add to scene
+        scene.add(tee);
     });
 
 
