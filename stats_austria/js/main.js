@@ -5,24 +5,6 @@ var bubblesDomainPopulation = [0, 300000];
 var bubblesDomainCases = [0, 1000];
 var oldYear = 2002;
 
-effectController = {
-    colorUrbanity: false,
-    colorPopulation: false,
-    showPopulation: false,
-    showCases: false,
-    colorScale: urbanityColorScale,
-    data: urbanity,
-    granularity: "Gemeinde",
-    causesOfDeath: "Bösartige Neubildungen",
-    year: 2002,
-    domainMin: 0,
-    domainMax: 1000,
-    animate: false,
-    loop: true,
-    causes: new Map()
-};
-
-
 // d3.schemeBlues[9]
 //         .range(["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"]);
 var populationColorScale = d3.scale.log()
@@ -50,10 +32,28 @@ var urbanityColorScale = d3.scale.ordinal()
     .range(urbanityColorRange);
 //  .domain([0, 20,200,1000])
 
-var deathsColorRange = ["#fff5f0", "#aa1017", "#a91016", "#a71016", "#a60f16", "#a40f16", "#a30e15", "#a10e15", "#67000d"];
+var deathsColorRange = ["#fff5f0", "#aa1017"];
 var deathsColorScale = d3.scale.linear()
     .domain([0, 900])
     .range(deathsColorRange);
+
+effectController = {
+    colorUrbanity: false,
+    colorPopulation: false,
+    showPopulation: false,
+    showCases: false,
+    colorScale: urbanityColorScale,
+    data: urbanity,
+    granularity: "Gemeinde",
+    causesOfDeath: "Bösartige Neubildungen",
+    year: 2002,
+    domainMin: 0,
+    domainMax: 1000,
+    animate: false,
+    loop: true,
+    causes: new Map()
+};
+
 
 // Map dimensions (in pixels)
 var width = window.innerWidth - 20,
@@ -117,15 +117,17 @@ var updateLegend = function () {
         .call(legendLinear);
 };
 
-var updateBubblesLegend = function (domain) {
+var updateBubblesLegend = function () {
     bubblesLegend.selectAll("*").remove();
 
     if (!effectController.showPopulation && !effectController.showCases) {
         return;
     }
 
-    // values are scaled to range 0,32
-    var radius = d3.scale.sqrt().domain(domain).range([0, 24]);
+    let domain = effectController.showCases ? bubblesDomainCases : bubblesDomainPopulation;
+
+    // values are scaled to range 0, 24
+    let radius = d3.scale.sqrt().domain(domain).range([0, 24]);
 
     bubblesLegend.selectAll("legend")
         .data(domain)
@@ -144,6 +146,9 @@ var updateBubblesLegend = function (domain) {
         .attr("y", d => -2 * radius(d))
         .attr("dy", "1.3em")
         .text(d3.format(".1s"));
+
+    // user may have zoomed
+    zoomed();
 };
 
 //Create zoom/pan listener
@@ -188,6 +193,7 @@ var onShowCausesOfDeathController = f1.add(effectController, 'causesOfDeath', ca
 var onDomainMinChangeController = f1.add(effectController, 'domainMin', 0, 500).step(1).listen();
 var onDomainMaxChangeController = f1.add(effectController, 'domainMax', 0, 1000).step(1).listen();
 
+var headline = document.getElementById("headline");
 
 var animate = function () {
 
@@ -201,17 +207,20 @@ var animate = function () {
         onAnimateController.setValue(false);
     }
 
+    // add only 0.1 to slow down animation but show data for Math.floor(year)
     effectController.year += 0.1;
 
+    // update only when year has changed
     if (Math.floor(effectController.year) !== oldYear) {
         oldYear = effectController.year;
-        updateColor();
-    }
 
-    if (effectController.showPopulation) {
-        updateBubbles(population, bubblesDomainPopulation);
-    } else if (effectController.showCases) {
-        updateBubbles(effectController.causes[effectController.causesOfDeath], bubblesDomainCases);
+        updateColor();
+
+        if (effectController.showPopulation) {
+            updateBubbles(population);
+        } else if (effectController.showCases) {
+            updateBubbles(effectController.causes[effectController.causesOfDeath]);
+        }
     }
 };
 
@@ -272,15 +281,17 @@ let updateDistricts = function (features) {
 
 // show causes of death data here
 var updateColor = function () {
+    headline.innerText = "Todesursachen Österreich " + Math.floor(effectController.year);
+
     municipalities.selectAll("path")
         .data(municipalityGeofeatures)
         .attr("fill", d => deathsColorScale(getIncidence(d)))
         .select("title").text(d => d.properties.name + ": " + population[d.properties.iso][Math.floor(effectController.year)] + " Einwohner\n" + getData(d) + " Fälle, Inzidenz " + getIncidence(d));
 
     if (effectController.showPopulation) {
-        updateBubbles(population, bubblesDomainPopulation);
+        updateBubbles(population);
     } else if (effectController.showCases) {
-        updateBubbles(effectController.causes[effectController.causesOfDeath], bubblesDomainCases);
+        updateBubbles(effectController.causes[effectController.causesOfDeath]);
     }
 
     if (effectController.granularity === "Bundesland") {
@@ -311,6 +322,12 @@ onDomainMaxChangeController.onChange(function (value) {
 onAnimateController.onChange(function (value) {
 
     if (value) {
+        if (effectController.colorUrbanity) {
+            onColorUrbanityController.setValue(false);
+        } else if (effectController.colorPopulation) {
+            onColorPopulationController.setValue(false);
+        }
+
         animate();
     } else {
         effectController.animate = false;
@@ -334,6 +351,12 @@ onYearChangeController.onChange(function (value) {
 onGranularityChangeController.onChange(function (value) {
     if (value) {
         districts.selectAll("*").remove();
+
+        if (effectController.colorUrbanity) {
+            onColorUrbanityController.setValue(false);
+        } else if (effectController.colorPopulation) {
+            onColorPopulationController.setValue(false);
+        }
 
         if (value === "Bezirk") {
             showDistricts();
@@ -387,31 +410,30 @@ var updateDomain = function (value) {
     onDomainMaxChangeController.setValue(max);
 };
 
-var showCauses = function (value) {
-
-    if (value in effectController.causes) {
-        console.log(value + " already loaded")
-        updateColor();
-        updateDomain(value);
-
-        return;
-    }
-
-    console.log("loading data for " + value);
-    d3.json("data/" + value + ".json", function (error, data) {
-        if (error) return console.log(error); //unknown error, check the console
-
-        //generate municipalities from TopoJSON
-        effectController.causes[value] = data;
-
-        updateColor();
-        updateDomain(value);
-    });
-};
 
 onShowCausesOfDeathController.onChange(function (value) {
     if (value) {
-        showCauses(value);
+        if (value in effectController.causes) {
+            console.log(value + " already loaded");
+
+            onYearChangeController.setValue(2002);
+            updateColor();
+            updateDomain(value);
+
+            return;
+        }
+
+        console.log("loading data for " + value);
+        d3.json("data/" + value + ".json", function (error, data) {
+            if (error) return console.log(error); //unknown error, check the console
+
+            //generate municipalities from TopoJSON
+            effectController.causes[value] = data;
+
+            onYearChangeController.setValue(2002);
+            updateColor();
+            updateDomain(value);
+        });
     }
 });
 
@@ -455,7 +477,8 @@ onColorPopulationController.onChange(function (value) {
     }
 });
 
-var updateBubbles = function (data, domain) {
+var updateBubbles = function (data) {
+    let domain = effectController.showCases ? bubblesDomainCases : bubblesDomainPopulation;
 
     let year = Math.floor(effectController.year);
 
@@ -476,24 +499,24 @@ onShowPopulationController.onChange(function (value) {
         onShowCasesController.setValue(false);
 
         // we want to display values between 0 and 300k
-        updateBubbles(population, bubblesDomainPopulation);
+        updateBubbles(population);
 
     } else if (!effectController.showCases) {
         bubbles.selectAll("circle").attr("r", 0);
     }
-    updateBubblesLegend(bubblesDomainPopulation);
+    updateBubblesLegend();
 });
 
 onShowCasesController.onChange(function (value) {
     if (value) {
         onShowPopulationController.setValue(false);
 
-        updateBubbles(effectController.causes[effectController.causesOfDeath], bubblesDomainCases);
+        updateBubbles(effectController.causes[effectController.causesOfDeath]);
 
     } else if (!effectController.showPopulation) {
         bubbles.selectAll("circle").attr("r", 0);
     }
-    updateBubblesLegend(bubblesDomainCases);
+    updateBubblesLegend();
 });
 
 
@@ -530,8 +553,7 @@ d3.json("data/gemeinden_wien_bezirke_topo.json", function (error, geodata) {
         .attr("transform", d => `translate(${path.centroid(d)})`)
         .attr("r", 0).append("title").text("");
 
-    showCauses(effectController.causesOfDeath);
-
+    onShowCausesOfDeathController.setValue(effectController.causesOfDeath);
     onGranularityChangeController.setValue("Bundesland");
 });
 
@@ -573,6 +595,8 @@ var tooltip = d3.select("body")
 
 var createChart = function (d) {
 
+    let year = Math.floor(effectController.year);
+
     tooltip.selectAll("*").remove();
 
     let cases = effectController.causes[effectController.causesOfDeath][d.properties.iso];
@@ -593,9 +617,10 @@ var createChart = function (d) {
     let y = d3.scale.linear()
         .range([height, 0]);
 
-    var xAxis = d3.svg.axis()
+    let xAxis = d3.svg.axis()
         .scale(x)
-        .orient("bottom");
+        .orient("bottom")
+        .tickFormat(d => ("0" + (d % 1000)).slice(-2)); // prepend zero to single digit years
 
     let yAxis = d3.svg.axis()
         .scale(y)
@@ -608,15 +633,6 @@ var createChart = function (d) {
         .y(function (d) {
             return y(d.incidence);
         });
-
-    tooltip.append("p")
-        .text(d.properties.name);
-
-    let svg = tooltip.append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     let calcIncidence = function (year, cases) {
         let pop = population[d.properties.iso][year];
@@ -632,6 +648,18 @@ var createChart = function (d) {
         };
 
     });
+
+    let incidence = calcIncidence(year, cases[year]);
+
+    tooltip.append("p")
+        .text(`${d.properties.name} ${year}: Inzidenz ${incidence}`);
+
+    let svg = tooltip.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
     x.domain(d3.extent(data, function (d) {
         return d.year;
@@ -667,13 +695,11 @@ var createChart = function (d) {
         .attr("class", "line")
         .attr("d", line);
 
-    // indicate currently shown data point
-    let currentYear = Math.floor(effectController.year);
-    let incidence = calcIncidence(currentYear, cases[currentYear]);
+    // mark currently shown data point
     svg.append("circle")
         .attr("fill", "red")
         .attr("r", 3)
-        .attr("cx", x(currentYear))
+        .attr("cx", x(year))
         .attr("cy", y(incidence));
 };
 
@@ -714,4 +740,17 @@ function zoomed() {
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
     bubbles.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
         .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px");
+
+    if (effectController.showPopulation || effectController.showCases) {
+        let domain = effectController.showCases ? bubblesDomainCases : bubblesDomainPopulation;
+
+        // values are scaled to range 0, 24
+        let radius = d3.scale.sqrt().domain(domain).range([0, 24]);
+
+        bubblesLegend.selectAll("circle")
+            .attr("r", d => radius(d) * zoom.scale())
+            .attr("cy", d => (-radius(d) * zoom.scale()) + "px");
+        //.attr("transform", d => "translate(" + (-radius(d) * zoom.scale() + ",0)"));
+        //bubblesLegend.selectAll("*").attr(`translate(${-width * zoom.scale()},0)`);
+    }
 };
