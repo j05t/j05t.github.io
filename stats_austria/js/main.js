@@ -56,8 +56,8 @@ effectController = {
 
 
 // Map dimensions (in pixels)
-var width = window.innerWidth - 20,
-    height = window.innerHeight - 20;
+var width = window.innerWidth - 16,
+    height = window.innerHeight - 16;
 
 // Map projection
 var projection = d3.geo.mercator()
@@ -91,7 +91,7 @@ var bubbles = svg.append("g")
 // legend for incidence
 svg.append("g")
     .attr("class", "legendLinear")
-    .attr("transform", "translate(10,140)");
+    .attr("transform", "translate(10,120)");
 
 var legendLinear = d3.legend.color()
     .labelFormat(d3.format(".0f"))
@@ -240,6 +240,17 @@ let getIncidence = function (d) {
 
 
 let updateDistricts = function (features) {
+
+    // position tooltip, which is 240x150
+    let getX = function () {
+        let pageX = d3.event.pageX;
+        return width - pageX < 240 ? pageX - 255 : pageX + 15;
+    };
+    let getY = function () {
+        let pageY = d3.event.pageY;
+        return height - pageY < 175 ? pageY - 180 : pageY + 15;
+    };
+
     if (districts.selectAll("path")[0].length === 0) {
         // we have to create the paths first
         districts.selectAll("path")
@@ -254,7 +265,7 @@ let updateDistricts = function (features) {
                 return tooltip.style("visibility", "visible");
             })
             .on("mousemove", function () {
-                return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 15) + "px");
+                return tooltip.style("top", getY() + "px").style("left", getX() + "px");
             })
             .on("mouseout", function () {
                 return tooltip.style("visibility", "hidden")
@@ -271,7 +282,7 @@ let updateDistricts = function (features) {
                 return tooltip.style("visibility", "visible");
             })
             .on("mousemove", function () {
-                return tooltip.style("top", (d3.event.pageY + 10) + "px").style("left", (d3.event.pageX + 15) + "px");
+                return tooltip.style("top", getY() + "px").style("left", getX() + "px");
             })
             .on("mouseout", function () {
                 return tooltip.style("visibility", "hidden")
