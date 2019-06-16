@@ -59,48 +59,48 @@
         <span></span>
         <span></span>
 
-        <ul id="menu">
-            <li>
-                <img style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 32px;" src="img/twintee-logo.png" alt="TwinTee Logo" />
-            </li>
+      <ul id="menu">
+             <li>
+                 <img style="display: block; margin-left: auto; margin-right: auto; margin-bottom: 32px;" src="img/twintee-logo.png" alt="TwinTee Logo" />
+             </li>
 
-            <li><a id="head" href="#">Top View</a></li>
-            <li><a id="side" href="#">Side View</a></li>
-            <li><a id="tilted" href="#">3D Illustration</a></li>
+             <li>
+                 <img class="icon" src="img/screenshot.png" width="24" height="24" alt="Screenshot Icon"/>
+                 <a id="screenshot" href="#">Screenshot</a>
+             </li>
 
-            <li>
-                <img id="icon_visibility" class="icon" src="css/img/visible.png" width="32" height="32" alt="Visibility Icon" />
-                <a id="engraving" href="#">Inscription</a>
-            </li>
+             <li><a id="head" href="#">Top View</a></li>
+             <li><a id="side" href="#">Side View</a></li>
+             <li><a id="tilted" href="#">3D Illustration</a></li>
 
-            <li>
-                <img class="icon" src="img/screenshot.png" width="32" height="32" alt="Screenshot Icon"/>
-                <a id="screenshot" href="#">Screenshot</a>
-            </li>
+             <li>
+                 <img id="icon_visibility" src="css/img/visible.png" class="icon_visible" width="32" height="32" alt="Visibility Icon" />
+                 <a id="engraving" href="#">Inscription</a>
+             </li>
 
-            <li>
-                <input id="engravingText" maxlength="18" placeholder="Text-Engraving" />
-            </li>
+             <li>
+                 <input id="engravingText" maxlength="18" placeholder="Text-Engraving" />
+             </li>
 
-            <li>
-                <span class="nobr" id="z000" title="Black" style="height: 24px; width: 24px; background-color:#000"></span>
-                <span class="nobr" id="zF541B7" title="Pink (PANTONE 813 U)" style="height: 24px; width: 24px; background-color:#F541B7">&nbsp;</span>
-                <span class="nobr" id="z3BD23D" title="Green (PANTONE 802 U)" style="height: 24px; width: 24px; background-color:#3BD23D">&nbsp;</span>
-                <span class="nobr" id="z1295D8" title="Blue(PANTONE 299 U)" style="height: 24px; width: 24px; background-color:#1295D8">&nbsp;</span>
-                <span class="nobr" id="zFF8767" title="Orange (PANTONE 811 U)" style="height: 24px; width: 24px; background-color:#FF8767">&nbsp;</span>
-                <span class="nobr" id="ze4e83b" title="Yellow (PANTONE 809 U)" style="height: 24px; width: 24px; background-color:#e4e83b">&nbsp;</span>
-                <span class="nobr" id="zfff" title="White" style="height: 24px; width: 24px; background-color:#fff">&nbsp;</span>
-            </li>
+             <li>
+                 <span class="nobr" id="z000" title="Black" style="height: 24px; width: 24px; background-color:#000"></span>
+                 <span class="nobr" id="zF541B7" title="Pink (PANTONE 813 U)" style="height: 24px; width: 24px; background-color:#F541B7">&nbsp;</span>
+                 <span class="nobr" id="z3BD23D" title="Green (PANTONE 802 U)" style="height: 24px; width: 24px; background-color:#3BD23D">&nbsp;</span>
+                 <span class="nobr" id="z1295D8" title="Blue(PANTONE 299 U)" style="height: 24px; width: 24px; background-color:#1295D8">&nbsp;</span>
+                 <span class="nobr" id="zFF8767" title="Orange (PANTONE 811 U)" style="height: 24px; width: 24px; background-color:#FF8767">&nbsp;</span>
+                 <span class="nobr" id="ze4e83b" title="Yellow (PANTONE 809 U)" style="height: 24px; width: 24px; background-color:#e4e83b">&nbsp;</span>
+                 <span class="nobr" id="zfff" title="White" style="height: 24px; width: 24px; background-color:#fff">&nbsp;</span>
+             </li>
 
-            <li>
-                <p id="teeDescription">Note: This is an illustration only! <br/> <br/>You can move the tee within the room by holding the left mouse button. By scrolling with the mouse wheel, zoom will be available. Everytime you click on a menu view, the tee will recenter itself. The engraving can be activated simply by adding some text (max. 18 characters) into the inscription box. You´ll get back to the TWiNTEE customizer by closing the tab in your broswer. <br/> <br/> - developed by TWiNTEE.golf - </p>
-            </li>
+             <li>
+                 <p id="teeDescription">Note: This is an illustration only!<br/><br/>You can move the tee within the room by holding the left mouse button. By scrolling with the mouse wheel, zoom will be available. Everytime you click on a menu view, the tee will recenter itself. The engraving can be activated simply by adding some text (max. 18 characters) into the inscription box. You´ll get back to the TWiNTEE customizer by closing the tab in your broswer.<br/><br/>- developed by TWiNTEE.golf -</p>
+             </li>
 
-            <li>
-                <a id="engravedBy" href="https://www.edelraster.at/" target="_blank">Engraving by ...<br/><img src="img/edelraster_logo.png" alt="edelraster.at" /></a>
-            </li>
+             <li>
+                 <a id="engravedBy" href="https://www.edelraster.at/" target="_blank">Engraving by ...<br/><img src="img/edelraster_logo.png" alt="edelraster.at" /></a>
+             </li>
 
-        </ul>
+         </ul>
     </div>
 </nav>
 
