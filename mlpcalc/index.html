@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MLPcalc</title>
+    <style>
+        .dot {
+            height: 60px;
+            width: 60px;
+            background-color: #bbb;
+            border-radius: 50%;
+
+            font: 15px/13px Helvetica, Verdana, Tahoma;
+
+            min-width: 60px;
+
+            padding: 8px;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        input {
+            width: 60px;
+            margin: 8px;
+        }
+
+
+        #info1 {
+            float: left;
+            width: 50%;
+        }
+
+        #info2 {
+            float: left;
+            width: 50%;
+        }
+
+        #controls {
+            margin-top: 20px;
+            border: 1px solid black;
+            width: 180px;
+            padding: 16px;
+        }
+
+        .weights {
+            display: inline;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"></script>
+
+<h1>MLPcalc</h1>
+
+<div id="graph">
+    <label for="input1">Input 1:</label><input id="input1" value="0.05"/> --- w1:
+    <pre class="weights" id="w1">0.55</pre>
+    ---
+    <span class="dot" id="h1">0.1</span> --- w5:
+    <pre class="weights" id="w5">0.55</pre>
+    ---
+    <span class="dot" id="o1">5.2ff</span>
+    <label for="loss1">Loss outo1</label><input type="text" id="loss1" disabled>
+<br/>
+    <label for="input2">Input 2:</label><input id="input2" value="0.10"/> --- w4:
+    <pre class="weights" id="w4">0.55</pre>
+    ---
+    <span class="dot" id="h2">5.2ff</span> --- w8:
+    <pre class="weights" id="w8">0.55</pre>
+    ---
+    <span class="dot" id="o2">5.2ff</span>
+    <label for="loss2">Loss outo2</label><input type="text" id="loss2" disabled><br>
+</div>
+
+<div id="controls">
+    <label for="lr">Learning rate:</label><input id="lr" value="0.5"/><br/>
+    <button onclick="forward()">Forward</button>
+    <button onclick="backprop()">Backprop</button>
+</div>
+
+<div>
+    <pre id="info1"></pre>
+    <pre id="info2"></pre>
+</div>
+
+<script>
+    var input1 = document.getElementById("input1");
+    var input2 = document.getElementById("input2");
+    var loss1 = document.getElementById("loss1");
+    var loss2 = document.getElementById("loss2");
+    var lrate = document.getElementById("lr");
+
+    var neth1, neth2, outh1, outh2, neto1, neto2, outo1, outo2, e1, e2, etotal;
+    var i1, i2, w1, w2, w3, w4, w5, w6, w7, w8, b1, b2, y1, y2;
+
+    var info1 = document.getElementById("info1");
+    var info2 = document.getElementById("info2");
+
+    var sigmoid = function (x) {
+        return 1 / (1 + Math.exp(-x))
+    };
+
+    var dsigmoid = function (x) {
+        return x * (1 - x);
+    };
+
+    w1 = 0.15;
+    w2 = 0.25;
+    w3 = 0.2;
+    w4 = 0.3;
+
+    w5 = 0.4;
+    w6 = 0.5;
+    w7 = 0.45;
+    w8 = 0.55;
+
+    b1 = 0.35;
+    b2 = 0.6;
+
+    y1 = 0.01;
+    y2 = 0.99;
+
+
+    var forward = function () {
+
+        i1 = parseFloat(input1.value);
+        i2 = parseFloat(input2.value);
+
+        neth1 = w1 * i1 + w3 * i2 + b1;
+        neth2 = w2 * i1 + w4 * i2 + b1;
+
+        outh1 = sigmoid(neth1);
+        outh2 = sigmoid(neth2);
+
+        neto1 = w5 * outh1 + w7 * outh2 + b2;
+        neto2 = w6 * outh1 + w8 * outh2 + b2;
+
+        outo1 = sigmoid(neto1);
+        outo2 = sigmoid(neto2);
+
+        e1 = 0.5 * (outo1 - y1) ** 2;
+        e2 = 0.5 * (outo2 - y2) ** 2;
+        etotal = e1 + e2;
+
+        info1.innerText = `i1: ${i1} \ni2: ${i2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne11: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
+        loss1.value = e1;
+        loss2.value = e2;
+    };
+
+    var backprop = function () {
+        var lr = parseFloat(lrate.value);
+
+        // local derivatives
+
+        // etotal = 0.5(outo1 - y1)**2 + 0.5(outo2 - y2)**2
+        var detotal_outo1 = outo1;
+        var detotal_outo2 = outo2;
+
+        var douto1_dneto1 = dsigmoid(detotal_outo1);
+        var douto2_dneto2 = dsigmoid(detotal_outo2);
+
+        var dneto1_w5 = outh1;
+        var dneto1_w6 = outh1;
+        var dneto2_w7 = outh2;
+        var dneto2_w8 = outh2;
+
+        var douth1_dneth1 = dsigmoid(outh1);
+        var douth2_dneth2 = dsigmoid(outh2);
+
+        var dneth1_w1 = i1;
+        var dneth1_w2 = i2;
+        var dneth2_w3 = i1;
+        var dneth2_w4 = i2;
+
+        // update weights
+        var new_w5 = w5 - lr * detotal_outo1 * douth1_dneth1 * dneto1_w5;
+        var new_w6 = w6 - lr * detotal_outo2 * douth2_dneth2 * dneto1_w6;
+        var new_w7 = w7 - lr * detotal_outo1 * douth1_dneth1 * dneto2_w7;
+        var new_w8 = w8 - lr * detotal_outo2 * douth2_dneth2 * dneto2_w8;
+
+        // hidden layer: composite loss
+        // deo1_douth1 = deo1_neto1 * douto1_neto1
+        var de1_outh1 = detotal_outo1 * douto1_dneto1;
+
+        // dneto1_outh1 w5 * outh1 + w7 * outh2 + b2
+        // dneto2_outh2 w6 * outh1 + w8 * outh2 + b2
+        var dneto1_outh1 = w5;
+        var dneto1_outh2 = w7;
+        var dneto2_outh1 = w6;
+        var dneto2_outh2 = w8;
+
+
+
+        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndouto1_dneto1: ${douto1_dneto1} \ndouto2_dneto2: ${douto2_dneto2} \ndneto1_w5: ${dneto1_w5} \ndneto1_w6: ${dneto1_w6} \ndneto2_w7: ${dneto2_w7} \ndneto2_w8: ${dneto2_w8} \ndouth1_dneth1: ${douth1_dneth1} \ndouth2_dneth2: ${douth2_dneth2}\nnew_w5: ${new_w5}\nnew_w6: ${new_w6}\nnew_w7: ${new_w7}\nnew_w8: ${new_w8}\nde1_outh1: ${de1_outh1}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}`;
+    };
+
+    forward();
+
+</script>
+
+</body>
+</html>
