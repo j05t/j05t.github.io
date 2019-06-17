@@ -1,8 +1,5 @@
 var backgroundImage = "img/background.jpg";
 
-var language = navigator.language || navigator.userLanguage;
-
-
 var tee, head, wood, controls, baseHead;
 var rotate = true;
 
@@ -24,8 +21,16 @@ var dynamicTexture = new THREEx.DynamicTexture(512, 1024);
 
 
 var updateLanguage = function () {
+    let lang;
 
-    let l = language.substring(0, 2);
+    // may be defined in PHP file
+    if (typeof language === "undefined") {
+        lang = navigator.language || navigator.userLanguage;
+    } else {
+        lang = language;
+    }
+
+    let l = lang.substring(0, 2);
     console.log("detected language " + l);
 
     if (l !== "de") {
