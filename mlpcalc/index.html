@@ -9,21 +9,16 @@
             width: 60px;
             background-color: #bbb;
             border-radius: 50%;
-
-            font: 15px/13px Helvetica, Verdana, Tahoma;
-
             min-width: 60px;
-
             padding: 8px;
             text-align: center;
             margin-top: 100px;
         }
 
         input {
-            width: 60px;
+            width: 42px;
             margin: 8px;
         }
-
 
         #info1 {
             float: left;
@@ -36,47 +31,101 @@
         }
 
         #controls {
-            margin-top: 20px;
+            margin-top: 10px;
             border: 1px solid black;
-            width: 180px;
-            padding: 16px;
+            width: 170px;
+            padding: 6px;
+
         }
 
         .weights {
             display: inline;
             margin: 0;
         }
+
+
+        .rotatel {
+            width: 200px;
+            position: absolute;
+            top: 140px;
+            left: 200px;
+            transform: translateX(-50%) translateY(-50%) rotate(-42deg);
+        }
+
+        .rotater {
+            width: 200px;
+            position: absolute;
+            top: 180px;
+            left: 220px;
+            transform: translateX(-50%) translateY(-50%) rotate(42deg);
+        }
+
+        .rotatel2 {
+            width: 200px;
+            position: absolute;
+            top: 140px;
+            left: 400px;
+            transform: translateX(-50%) translateY(-50%) rotate(-42deg);
+        }
+
+        .rotater2 {
+            width: 200px;
+            position: absolute;
+            top: 180px;
+            left: 420px;
+            transform: translateX(-50%) translateY(-50%) rotate(42deg);
+        }
     </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"></script>
 
-<h1>MLPcalc</h1>
+<h1>Simple Neural Network Calculator</h1>
 
 <div id="graph">
-    <label for="input1">Input 1:</label><input id="input1" value="0.05"/> --- w1:
-    <pre class="weights" id="w1">0.55</pre>
+    <label for="input1">Input 1:</label><input id="input1" value="0.05"/>---
+    <pre class="weights" id="w1">w1: 0.55</pre>
     ---
-    <span class="dot" id="h1">0.1</span> --- w5:
-    <pre class="weights" id="w5">0.55</pre>
+    <span class="dot" id="h1out">h1out: 0.1</span>---
+    <pre class="weights" id="w5">w5: 0.55</pre>
     ---
-    <span class="dot" id="o1">5.2ff</span>
-    <label for="loss1">Loss outo1</label><input type="text" id="loss1" disabled>
-<br/>
-    <label for="input2">Input 2:</label><input id="input2" value="0.10"/> --- w4:
-    <pre class="weights" id="w4">0.55</pre>
+    <span class="dot" id="o1out">o1out: 5.2ff</span>
+    <label for="loss1">Loss o1out</label><input type="text" id="loss1" disabled>
+    <br/>
+    <br/>
+    <br/>
+    <br/><br/><br/>
+
+    <div class="rotater">
+        <pre class="weights" id="w2"></pre>
+    </div>
+    <div class="rotatel">
+        <pre class="weights" id="w3"></pre>
+    </div>
+    <div class="rotater2">
+        <pre class="weights" id="w6"></pre>
+    </div>
+    <div class="rotatel2">
+        <pre class="weights" id="w7"></pre>
+    </div>
+    <label for="input2">Input 2:</label><input id="input2" value="0.10"/>---
+    <pre class="weights" id="w4"></pre>
     ---
-    <span class="dot" id="h2">5.2ff</span> --- w8:
-    <pre class="weights" id="w8">0.55</pre>
+    <span class="dot" id="h2out">h</span>---
+    <pre class="weights" id="w8">5</pre>
     ---
-    <span class="dot" id="o2">5.2ff</span>
-    <label for="loss2">Loss outo2</label><input type="text" id="loss2" disabled><br>
+    <span class="dot" id="o2out"></span>
+    <label for="loss2">Loss o2out</label><input type="text" id="loss2" disabled><br>
 </div>
 
 <div id="controls">
     <label for="lr">Learning rate:</label><input id="lr" value="0.5"/><br/>
     <button onclick="forward()">Forward</button>
-    <button onclick="backprop()">Backprop</button>
+    <button onclick="backward()">Backward</button>
+    <p>Forward + Backward:</p>
+    <button onclick="loop(1)">1x</button>
+    <button onclick="loop(10)">10x</button>
+    <button onclick="loop(50)">50x</button>
+    <button onclick="loop(100)">100x</button>
 </div>
 
 <div>
@@ -90,6 +139,24 @@
     var loss1 = document.getElementById("loss1");
     var loss2 = document.getElementById("loss2");
     var lrate = document.getElementById("lr");
+
+    var vw1 = document.getElementById("w1");
+    var vw2 = document.getElementById("w2");
+    var vw3 = document.getElementById("w3");
+    var vw4 = document.getElementById("w4");
+    var vw5 = document.getElementById("w5");
+    var vw6 = document.getElementById("w6");
+    var vw7 = document.getElementById("w7");
+    var vw8 = document.getElementById("w8");
+
+    var vb1 = document.getElementById("b1");
+    var vb2 = document.getElementById("b2");
+
+    var h1out = document.getElementById("h1out");
+    var h2out = document.getElementById("h2out");
+    var o1out = document.getElementById("o1out");
+    var o2out = document.getElementById("o2out");
+
 
     var neth1, neth2, outh1, outh2, neto1, neto2, outo1, outo2, e1, e2, etotal;
     var i1, i2, w1, w2, w3, w4, w5, w6, w7, w8, b1, b2, y1, y2;
@@ -143,19 +210,21 @@
         e2 = 0.5 * (outo2 - y2) ** 2;
         etotal = e1 + e2;
 
-        info1.innerText = `i1: ${i1} \ni2: ${i2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne11: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
-        loss1.value = e1;
-        loss2.value = e2;
+        info1.innerText = `i1: ${i1} \ni2: ${i2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne11: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
+        loss1.value = e1.toFixed(4);
+        loss2.value = e2.toFixed(4);
     };
 
-    var backprop = function () {
+    var backward = function () {
         var lr = parseFloat(lrate.value);
-
-        // local derivatives
 
         // etotal = 0.5(outo1 - y1)**2 + 0.5(outo2 - y2)**2
         var detotal_outo1 = outo1;
         var detotal_outo2 = outo2;
+
+        // deo1_outo1 = 2 * 1/2 (y1 - outo1)**1 * -1 + 0
+        var deo1_outo1 = -(y1 - outo1);
+        var deo2_outo2 = -(y2 - outo1);
 
         var douto1_dneto1 = dsigmoid(detotal_outo1);
         var douto2_dneto2 = dsigmoid(detotal_outo2);
@@ -168,16 +237,17 @@
         var douth1_dneth1 = dsigmoid(outh1);
         var douth2_dneth2 = dsigmoid(outh2);
 
-        var dneth1_w1 = i1;
-        var dneth1_w2 = i2;
-        var dneth2_w3 = i1;
-        var dneth2_w4 = i2;
+        // chaining gradients to get derivative of total error with respect to weights
+        var detotal_w5 = deo1_outo1 * douth1_dneth1 * dneto1_w5;
+        var detotal_w6 = deo2_outo2 * douth2_dneth2 * dneto1_w6;
+        var detotal_w7 = deo1_outo1 * douth1_dneth1 * dneto2_w7;
+        var detotal_w8 = deo2_outo2 * douth2_dneth2 * dneto2_w8;
 
-        // update weights
-        var new_w5 = w5 - lr * detotal_outo1 * douth1_dneth1 * dneto1_w5;
-        var new_w6 = w6 - lr * detotal_outo2 * douth2_dneth2 * dneto1_w6;
-        var new_w7 = w7 - lr * detotal_outo1 * douth1_dneth1 * dneto2_w7;
-        var new_w8 = w8 - lr * detotal_outo2 * douth2_dneth2 * dneto2_w8;
+        // new weights 5-8
+        var new_w5 = w5 - lr * detotal_w5;
+        var new_w6 = w6 - lr * detotal_w6;
+        var new_w7 = w7 - lr * detotal_w7;
+        var new_w8 = w8 - lr * detotal_w8;
 
         // hidden layer: composite loss
         // deo1_douth1 = deo1_neto1 * douto1_neto1
@@ -190,12 +260,62 @@
         var dneto2_outh1 = w6;
         var dneto2_outh2 = w8;
 
+        // neth1 = w1 * i1 + w3 * i2 + b1;
+        // neth2 = w2 * i1 + w4 * i2 + b1;
+        var dneth1_w1 = i1;
+        var dneth1_w2 = i1;
+        var dneth2_w3 = i2;
+        var dneth2_w4 = i2;
 
+        // new weights 1-4
+        var new_w1 = w1 - lr * dneth1_w1 * douth1_dneth1 * de1_outh1;
+        var new_w2 = w2 - lr * dneth1_w2 * douth2_dneth2 * de1_outh1;
+        var new_w3 = w3 - lr * dneth2_w3 * douth1_dneth1 * de1_outh1;
+        var new_w4 = w4 - lr * dneth2_w4 * douth2_dneth2 * de1_outh1;
 
-        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndouto1_dneto1: ${douto1_dneto1} \ndouto2_dneto2: ${douto2_dneto2} \ndneto1_w5: ${dneto1_w5} \ndneto1_w6: ${dneto1_w6} \ndneto2_w7: ${dneto2_w7} \ndneto2_w8: ${dneto2_w8} \ndouth1_dneth1: ${douth1_dneth1} \ndouth2_dneth2: ${douth2_dneth2}\nnew_w5: ${new_w5}\nnew_w6: ${new_w6}\nnew_w7: ${new_w7}\nnew_w8: ${new_w8}\nde1_outh1: ${de1_outh1}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}`;
+        // update weights
+        w5 = new_w5;
+        w6 = new_w6;
+        w7 = new_w7;
+        w8 = new_w8;
+
+        w1 = new_w1;
+        w2 = new_w2;
+        w3 = new_w3;
+        w4 = new_w4;
+
+        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${deo1_outo1} \ndeo2_outo2: ${deo2_outo2} \ndouto1_dneto1: ${douto1_dneto1} \ndouto2_dneto2: ${douto2_dneto2} \ndneto1_w5: ${dneto1_w5} \ndneto1_w6: ${dneto1_w6} \ndneto2_w7: ${dneto2_w7} \ndneto2_w8: ${dneto2_w8} \ndouth1_dneth1: ${douth1_dneth1} \ndouth2_dneth2: ${douth2_dneth2}\ndetotal_w5: ${detotal_w5}\nnew_w5: ${new_w5}\nnew_w6: ${new_w6}\nnew_w7: ${new_w7}\nnew_w8: ${new_w8}\nde1_outh1: ${de1_outh1}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}`;
+
+        updateView();
     };
 
+    var loop = function (iterations) {
+        for (let i = 0; i < iterations; i++) {
+            forward();
+            backward();
+        }
+    };
+
+    var updateView = function () {
+        vw1.innerText = "w1 " + w1.toFixed(4);
+        vw2.innerText = `w2 ${w2.toFixed(4)} ---------`;
+        vw3.innerText = `w3 ${w3.toFixed(4)}    ------`;
+        vw4.innerText = "w4 " + w4.toFixed(4);
+
+        vw5.innerText = "w5 " + w5.toFixed(4);
+        vw6.innerText = `w6 ${w6.toFixed(4)} ---------`;
+        vw7.innerText = `w7 ${w7.toFixed(4)}    ------`;
+        vw8.innerText = "w8 " + w8.toFixed(4);
+
+        o1out.innerText = "o1 " + outo1.toFixed(4);
+        o2out.innerText = "o2 " + outo2.toFixed(4);
+        h1out.innerText = "h1 " + outh2.toFixed(4);
+        h2out.innerText = "h2 " + outh2.toFixed(4);
+    };
+
+
     forward();
+    updateView();
 
 </script>
 
