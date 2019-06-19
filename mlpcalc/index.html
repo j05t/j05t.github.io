@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>MLPcalc</title>
     <style>
+        body {
+            font-size: 16px;
+            line-height: 18px;
+            font-family: "Times New Roman", Times, serif;
+        }
 
         .dot {
             height: 60px;
@@ -16,9 +21,12 @@
             margin-top: 100px;
         }
 
+
         input {
             width: 48px;
             margin: 8px;
+            height: 20px;
+            padding: 2px;
         }
 
         #info1 {
@@ -34,7 +42,7 @@
         #controls {
             margin-top: 10px;
             border: 1px solid black;
-            width: 180px;
+            width: 200px;
             padding: 6px;
         }
 
@@ -57,7 +65,7 @@
         .rotater {
             width: 200px;
             position: absolute;
-            top: 175px;
+            top: 165px;
             left: 200px;
             transform: translateX(-50%) translateY(-50%) rotate(42deg);
         }
@@ -73,25 +81,29 @@
         .rotater2 {
             width: 200px;
             position: absolute;
-            top: 175px;
+            top: 165px;
             left: 400px;
             transform: translateX(-50%) translateY(-50%) rotate(42deg);
         }
 
         #bias1 {
             left: 240px;
-            width: 80px;
+            width: 120px;
             float: left;
             position: absolute;
         }
 
         #bias2 {
-            left: 440px;
-            width: 80px;
+            left: 430px;
+            width: 120px;
             float: left;
             position: absolute;
-
         }
+
+        #graph {
+            width: 900px;
+        }
+
     </style>
 </head>
 <body>
@@ -99,7 +111,7 @@
 <h1>Simple Neural Network Calculator</h1>
 
 <div id="graph">
-    <label for="input1">Input 1:</label><input id="input1" value="0.05"/>---w1
+    <label for="input1">Input 1</label><input id="input1" value="0.05"/>---w1
     <input class="weights" id="w1" value="0.15"/>
     ---
     <span class="dot" id="h1out"></span>---w5
@@ -107,12 +119,12 @@
     ---
     <span class="dot" id="o1out"></span>
     <label for="loss1">Loss</label><input type="text" id="loss1" disabled>
-    <label for="target1">target1</label><input type="text" id="target1" value="0.01">
+    <label for="target1">Target 1</label><input type="text" id="target1" value="0.01">
     <br/>
     <br/>
     <br/>
     <br/><br/><br/>
-
+    <br/>
     <div class="rotater">w2
         <input class="weights" id="w2" value="0.25"/>--------------
     </div>
@@ -125,7 +137,7 @@
     <div class="rotatel2">w7
         <input class="weights" id="w7" value="0.45"/>--------------
     </div>
-    <label for="input2">Input 2:</label><input id="input2" value="0.10"/>---w4
+    <label for="input2">Input 2</label><input id="input2" value="0.10"/>---w4
     <input class="weights" id="w4" value="0.3"/>
     ---
     <span class="dot" id="h2out">h</span>---w8
@@ -133,14 +145,16 @@
     ---
     <span class="dot" id="o2out"></span>
     <label for="loss2">Loss</label><input type="text" id="loss2" disabled>
-    <label for="target2">target2</label><input type="text" id="target2" value="0.99">
+    <label for="target2">Target 2</label><input type="text" id="target2" value="0.99">
     <br/><br/>
 
     <div id="bias1">
-        <label for="bias1">bias1</label><input type="text" id="b1" value="0.35">
+        <label for="bias1">Bias 1</label><input type="text" id="b1" value="0.35">
+        Backprop<input type="checkbox" name="bias" value="0" disabled>
     </div>
     <div id="bias2">
-        <label for="bias2">bias2</label><input type="text" id="b2" value="0.6">
+        <label for="bias2">Bias 2</label><input type="text" id="b2" value="0.6">
+        Backprop<input type="checkbox" name="bias" value="0" disabled>
     </div>
 
 </div>
@@ -263,6 +277,11 @@
         var dneto1_w6 = outh1;
         var dneto2_w7 = outh2;
         var dneto2_w8 = outh2;
+
+        var deo1_neto1 = deo1_outo1 * douto1_dneto1;
+        var deo2_neto2 = deo2_outo2 * douto2_dneto2;
+
+        var deo1_neth1 = deo1_neto1 * w1;
 
         var douth1_dneth1 = dsigmoid(outh1);
         var douth2_dneth2 = dsigmoid(outh2);
