@@ -343,6 +343,11 @@
         h2out.innerText = "h2 " + outh2.toFixed(4);
     };
 
+    var inputs = document.getElementsByTagName('input');
+    for(var i = 0; i < inputs.length; i++) {
+        inputs[i].onkeyup = forward;
+    }
+
 
     forward();
     updateView();
