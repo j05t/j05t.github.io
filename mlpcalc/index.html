@@ -74,7 +74,7 @@
             width: 200px;
             position: absolute;
             top: 150px;
-            left: 400px;
+            left: 420px;
             transform: translateX(-50%) translateY(-50%) rotate(-42deg);
         }
 
@@ -82,7 +82,7 @@
             width: 200px;
             position: absolute;
             top: 165px;
-            left: 400px;
+            left: 420px;
             transform: translateX(-50%) translateY(-50%) rotate(42deg);
         }
 
@@ -257,6 +257,8 @@
         info1.innerText = `i1: ${i1} \ni2: ${i2} \ntarget1: ${y1} \ntarget2: ${y2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nb1: ${b1} \nb2: ${b2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne1: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
         loss1.value = e1.toFixed(4);
         loss2.value = e2.toFixed(4);
+
+        updateView();
     };
 
     var backward = function () {
@@ -357,10 +359,10 @@
         vw7.value = w7.toFixed(4);
         vw8.value = w8.toFixed(4);
 
-        o1out.innerText = "o1 " + outo1.toFixed(4);
-        o2out.innerText = "o2 " + outo2.toFixed(4);
-        h1out.innerText = "h1 " + outh2.toFixed(4);
-        h2out.innerText = "h2 " + outh2.toFixed(4);
+        o1out.innerText = `outo1 ${outo1.toFixed(4)}`;
+        o2out.innerText = `outo2 ${outo2.toFixed(4)}`;
+        h1out.innerText = `outh1 ${outh1.toFixed(4)}`;
+        h2out.innerText = `outh2 ${outh2.toFixed(4)}`;
     };
 
     var inputs = document.getElementsByTagName('input');
