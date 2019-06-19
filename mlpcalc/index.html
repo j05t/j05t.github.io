@@ -254,7 +254,7 @@
 
         // deo1_outo1 = 2 * 1/2 (y1 - outo1)**1 * -1 + 0
         var deo1_outo1 = -(y1 - outo1);
-        var deo2_outo2 = -(y2 - outo1);
+        var deo2_outo2 = -(y2 - outo2);
 
         var douto1_dneto1 = dsigmoid(detotal_outo1);
         var douto2_dneto2 = dsigmoid(detotal_outo2);
@@ -282,6 +282,7 @@
         // hidden layer: composite loss
         // deo1_douth1 = deo1_neto1 * douto1_neto1
         var de1_outh1 = detotal_outo1 * douto1_dneto1;
+        var de2_outh2 = detotal_outo2 * douto2_dneto2;
 
         // dneto1_outh1 w5 * outh1 + w7 * outh2 + b2
         // dneto2_outh2 w6 * outh1 + w8 * outh2 + b2
@@ -299,9 +300,9 @@
 
         // new weights 1-4
         var new_w1 = w1 - lr * dneth1_w1 * douth1_dneth1 * de1_outh1;
-        var new_w2 = w2 - lr * dneth1_w2 * douth2_dneth2 * de1_outh1;
+        var new_w2 = w2 - lr * dneth1_w2 * douth2_dneth2 * de2_outh2;
         var new_w3 = w3 - lr * dneth2_w3 * douth1_dneth1 * de1_outh1;
-        var new_w4 = w4 - lr * dneth2_w4 * douth2_dneth2 * de1_outh1;
+        var new_w4 = w4 - lr * dneth2_w4 * douth2_dneth2 * de2_outh2;
 
         // update weights
         w5 = new_w5;
@@ -344,7 +345,7 @@
     };
 
     var inputs = document.getElementsByTagName('input');
-    for(var i = 0; i < inputs.length; i++) {
+    for (var i = 0; i < inputs.length; i++) {
         inputs[i].onkeyup = forward;
     }
 
