@@ -268,8 +268,8 @@
         // etotal = 0.5(y1 - outo1)**2 + 0.5(outo2 - y2)**2
         // detotal_outo1 = (y1 - outo1) * ( 0 - 1 ) + 0  | chain rule, add constant
         // detotal_outo1 = (y1 - outo1) * ( -1 ) = -(y1 - outo1)
-        var detotal_outo1 = -(y1 - outo1);
-        var detotal_outo2 = -(y2 - outo2);
+        var detotal_outo1 = outo1 - y1;
+        var detotal_outo2 = outo2 - y2;
 
         // derivative of sigmoid is sigmoid(x) * (1 - sigmoid(x))
         var douto1_neto1 = outo1 * (1 - outo1);
@@ -303,12 +303,12 @@
        	// starting with deo1_outh1
        	// deo1_outh1 = deo1_neto1 * dneto1_outh1
 
-       	// deo1_outo1 is equal to  detotal_outo1
+       	// deo1_outo1 equals detotal_outo1
        	var deo1_neto1 = detotal_outo1 * douto1_neto1;
        	var deo2_neto2 = detotal_outo2 * douto2_neto2;
 
-        // dneto1_outh1 w5 * outh1 + w7 * outh2 + b2
-        // dneto2_outh2 w6 * outh1 + w8 * outh2 + b2
+        // neto1 = w5 * outh1 + w7 * outh2 + b2
+        // neto2 = w6 * outh1 + w8 * outh2 + b2
         var dneto1_outh1 = w5;
         var dneto1_outh2 = w7;
         var dneto2_outh1 = w6;
@@ -351,15 +351,16 @@
         w3 = new_w3;
         w4 = new_w4;
 
-        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${detotal_outo1} \ndeo2_outo2: ${detotal_outo2}  \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}\n\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}`;
+
+        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${detotal_outo1} \ndeo2_outo2: ${detotal_outo2}  \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}\n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
 
         updateView();
     };
 
     var loop = function (iterations) {
         for (let i = 0; i < iterations; i++) {
-            forward(false);
-            backward(false);
+            forward();
+            backward();
         }
     };
 
