@@ -117,11 +117,11 @@
     <label for="input1">Input 1</label><input id="input1" value="0.05"/>---w1
     <input class="weights" id="w1" value="0.15"/>
     ---
-    <span class="dot" id="h1out"></span>---w5
+    <span class="dot" id="h1out" title="outh1 = sigmoid(w1*i1 + w3*i2 + b1)"></span>---w5
     <input class="weights" id="w5" value="0.4"/>
     ---
-    <span class="dot" id="o1out"></span>
-    <label for="loss1">Loss</label><input type="text" id="loss1" disabled>
+    <span class="dot" id="o1out" title="outo1 = sigmoid(w5*outh1 + w7*outh2 + b2)"></span>
+    <label for="loss1">Loss</label><input title="e1 = 1/2 * (outo1 - target1)^2" type="text" id="loss1" disabled>
     <label for="target1">Target 1</label><input type="text" id="target1" value="0.01">
     <br/>
     <br/>
@@ -143,20 +143,20 @@
     <label for="input2">Input 2</label><input id="input2" value="0.10"/>---w4
     <input class="weights" id="w4" value="0.3"/>
     ---
-    <span class="dot" id="h2out">h</span>---w8
+    <span class="dot" id="h2out" title="outh2 = sigmoid(w2*i1 + w4*i2 + b1)"></span>---w8
     <input class="weights" id="w8" value="0.55"/>
     ---
-    <span class="dot" id="o2out"></span>
-    <label for="loss2">Loss</label><input type="text" id="loss2" disabled>
+    <span class="dot" id="o2out" title="outo2 = sigmoid(w6*outh1 + w8*outh2 + b2)"></span>
+    <label for="loss2">Loss</label><input title="e2 = 1/2 * (outo2 - target2)^2" type="text" id="loss2" disabled>
     <label for="target2">Target 2</label><input type="text" id="target2" value="0.99">
     <br/><br/>
 
     <div id="bias1">
-        <label for="bias1">Bias 1</label><input type="text" id="b1" value="0.35">
+        <label for="b1">Bias 1</label><input type="text" id="b1" value="0.35">
         Backprop<input type="checkbox" name="bias" value="0" disabled>
     </div>
     <div id="bias2">
-        <label for="bias2">Bias 2</label><input type="text" id="b2" value="0.6">
+        <label for="b2">Bias 2</label><input type="text" id="b2" value="0.6">
         Backprop<input type="checkbox" name="bias" value="0" disabled>
     </div>
 
