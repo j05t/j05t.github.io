@@ -358,30 +358,31 @@
     };
 
     var loop = function (iterations) {
+        forward();
         for (let i = 0; i < iterations; i++) {
-            forward();
             backward();
+            forward();
         }
     };
 
     var updateView = function () {
-        vw1.value = w1.toFixed(4);
-        vw2.value = w2.toFixed(4);
-        vw3.value = w3.toFixed(4);
-        vw4.value = w4.toFixed(4);
+        vw1.value = w1;
+        vw2.value = w2;
+        vw3.value = w3;
+        vw4.value = w4;
 
-        vw5.value = w5.toFixed(4);
-        vw6.value = w6.toFixed(4);
-        vw7.value = w7.toFixed(4);
-        vw8.value = w8.toFixed(4);
+        vw5.value = w5;
+        vw6.value = w6;
+        vw7.value = w7;
+        vw8.value = w8;
 
         o1out.innerText = `outo1 ${outo1.toFixed(4)}`;
         o2out.innerText = `outo2 ${outo2.toFixed(4)}`;
         h1out.innerText = `outh1 ${outh1.toFixed(4)}`;
         h2out.innerText = `outh2 ${outh2.toFixed(4)}`;
 
-        loss1.value = e1.toFixed(4);
-        loss2.value = e2.toFixed(4);
+        loss1.value = e1.toFixed(5);
+        loss2.value = e2.toFixed(5);
     };
 
     var inputs = document.getElementsByTagName('input');
