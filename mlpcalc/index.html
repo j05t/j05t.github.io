@@ -46,8 +46,8 @@
         }
 
         #controls > button {
-        	margin: 0px 0px 0 0;
-        	padding: 2px;
+            margin: 0px 0px 0 0;
+            padding: 2px;
         }
 
         .weights {
@@ -164,14 +164,14 @@
 
 <div id="controls">
     <label for="lr">Learning rate:</label><input id="lr" value="0.5"/><br/>
-    <button onclick="forward()">Forward</button>
-    <button onclick="backward()">Backward</button>
+    <button onclick="forward(false)">Forward</button>
+    <button onclick="backward(false)">Backward</button>
     <p>Forward + Backward:</p>
     <button onclick="loop(1)">1x</button>
     <button onclick="loop(10)">10x</button>
-    <button onclick="loop(50)">50x</button>
     <button onclick="loop(100)">100x</button>
-    <button onclick="loop(1000)">1000x</button>
+    <button onclick="loop(1000)">1k</button>
+    <button onclick="loop(100000)">100k</button>
 </div>
 
 <div>
@@ -180,7 +180,9 @@
 </div>
 
 <script>
-	"use strict";
+    "use strict";
+
+    var iterations = 0;
 
     var input1 = document.getElementById("input1");
     var input2 = document.getElementById("input2");
@@ -215,31 +217,36 @@
     var neth1, neth2, outh1, outh2, neto1, neto2, outo1, outo2, e1, e2, etotal;
     var i1, i2, w1, w2, w3, w4, w5, w6, w7, w8, b1, b2, y1, y2;
 
+    var lr = parseFloat(lrate.value);
+
+    
     var sigmoid = function (x) {
-        return 1 / (1 + Math.exp(-x))
+        return 1.0 / (1.0 + Math.exp(-x))
     };
 
 
-    var forward = function () {
+    var forward = function (inLoop) {
 
-        i1 = parseFloat(input1.value);
-        i2 = parseFloat(input2.value);
+        if (!inLoop) {
+            i1 = parseFloat(input1.value);
+            i2 = parseFloat(input2.value);
 
-        w1 = parseFloat(vw1.value);
-        w2 = parseFloat(vw2.value);
-        w3 = parseFloat(vw3.value);
-        w4 = parseFloat(vw4.value);
+            w1 = parseFloat(vw1.value);
+            w2 = parseFloat(vw2.value);
+            w3 = parseFloat(vw3.value);
+            w4 = parseFloat(vw4.value);
 
-        w5 = parseFloat(vw5.value);
-        w6 = parseFloat(vw6.value);
-        w7 = parseFloat(vw7.value);
-        w8 = parseFloat(vw8.value);
+            w5 = parseFloat(vw5.value);
+            w6 = parseFloat(vw6.value);
+            w7 = parseFloat(vw7.value);
+            w8 = parseFloat(vw8.value);
 
-        y1 = parseFloat(vtarget1.value);
-        y2 = parseFloat(vtarget2.value);
+            y1 = parseFloat(vtarget1.value);
+            y2 = parseFloat(vtarget2.value);
 
-        b1 = parseFloat(vb1.value);
-        b2 = parseFloat(vb2.value);
+            b1 = parseFloat(vb1.value);
+            b2 = parseFloat(vb2.value);
+        }
 
         neth1 = w1 * i1 + w3 * i2 + b1;
         neth2 = w2 * i1 + w4 * i2 + b1;
@@ -257,88 +264,94 @@
         e2 = 0.5 * (outo2 - y2) ** 2;
         etotal = e1 + e2;
 
-        info1.innerText = `i1: ${i1} \ni2: ${i2} \ntarget1: ${y1} \ntarget2: ${y2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nb1: ${b1} \nb2: ${b2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne1: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
+        if (!inLoop) {
+            info1.innerText = `iterations: ${iterations}\ni1: ${i1} \ni2: ${i2} \ntarget1: ${y1} \ntarget2: ${y2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nb1: ${b1} \nb2: ${b2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne1: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
+            updateView();
+        }
 
-        updateView();
     };
 
-    var backward = function () {
-        var lr = parseFloat(lrate.value);
+    var backward = function (inLoop) {
+        iterations++;
+
+        if (!inLoop) {
+            lr = parseFloat(lrate.value);
+        }
 
         // etotal = 0.5(y1 - outo1)**2 + 0.5(outo2 - y2)**2
         // detotal_outo1 = (y1 - outo1) * ( 0 - 1 ) + 0  | chain rule, add constant
         // detotal_outo1 = (y1 - outo1) * ( -1 ) = -(y1 - outo1)
-        var detotal_outo1 = outo1 - y1;
-        var detotal_outo2 = outo2 - y2;
+        let detotal_outo1 = outo1 - y1;
+        let detotal_outo2 = outo2 - y2;
 
-        // derivative of sigmoid is sigmoid(x) * (1 - sigmoid(x))
-        var douto1_neto1 = outo1 * (1 - outo1);
-        var douto2_neto2 = outo2 * (1 - outo2);
+        // derivative of sigmoid(x) is sigmoid(x) * (1 - sigmoid(x))
+        let douto1_neto1 = outo1 * (1.0 - outo1);
+        let douto2_neto2 = outo2 * (1.0 - outo2);
 
         // neto1 = w5 * outh1 + w7 * outh2 + b2
         // neto2 = w6 * outh1 + w8 * outh2 + b2
-        var dneto1_w5 = outh1;
-        var dneto2_w6 = outh1;
-        var dneto1_w7 = outh2;
-        var dneto2_w8 = outh2;
+        let dneto1_w5 = outh1;
+        let dneto2_w6 = outh1;
+        let dneto1_w7 = outh2;
+        let dneto2_w8 = outh2;
 
-         // chaining gradients to get derivatives of total error with respect to weights 5-8
-        var detotal_w5 = detotal_outo1 * douto1_neto1 * dneto1_w5;
-        var detotal_w6 = detotal_outo2 * douto2_neto2 * dneto2_w6;
-        var detotal_w7 = detotal_outo1 * douto1_neto1 * dneto1_w7;
-        var detotal_w8 = detotal_outo2 * douto2_neto2 * dneto2_w8;
+        // chaining gradients to get derivatives of total error with respect to weights 5-8
+        let detotal_w5 = detotal_outo1 * douto1_neto1 * dneto1_w5;
+        let detotal_w6 = detotal_outo2 * douto2_neto2 * dneto2_w6;
+        let detotal_w7 = detotal_outo1 * douto1_neto1 * dneto1_w7;
+        let detotal_w8 = detotal_outo2 * douto2_neto2 * dneto2_w8;
 
         // new weights 5-8
-        var new_w5 = w5 - lr * detotal_w5;
-        var new_w6 = w6 - lr * detotal_w6;
-        var new_w7 = w7 - lr * detotal_w7;
-        var new_w8 = w8 - lr * detotal_w8;
+        let new_w5 = w5 - lr * detotal_w5;
+        let new_w6 = w6 - lr * detotal_w6;
+        let new_w7 = w7 - lr * detotal_w7;
+        let new_w8 = w8 - lr * detotal_w8;
 
 
-        // backprop to hidden layer
+        // backprop into hidden layer
 
-       	// detotal_w1 = detotal_outh1 * douth1_neth1 * dneth1_w1
-       	// detotal_outh1 = deo1_outh1 + deo2_outh1
+        // detotal_w1 = detotal_outh1 * douth1_neth1 * dneth1_w1
+        // detotal_outh1 = deo1_outh1 + deo2_outh1
 
-       	// starting with deo1_outh1
-       	// deo1_outh1 = deo1_neto1 * dneto1_outh1
+        // starting with deo1_outh1
+        // deo1_outh1 = deo1_neto1 * dneto1_outh1
 
-       	// deo1_outo1 equals detotal_outo1
-       	var deo1_neto1 = detotal_outo1 * douto1_neto1;
-       	var deo2_neto2 = detotal_outo2 * douto2_neto2;
+        // deo1_outo1 equals detotal_outo1
+        let deo1_neto1 = detotal_outo1 * douto1_neto1;
+        let deo2_neto2 = detotal_outo2 * douto2_neto2;
 
         // neto1 = w5 * outh1 + w7 * outh2 + b2
         // neto2 = w6 * outh1 + w8 * outh2 + b2
-        var dneto1_outh1 = w5;
-        var dneto1_outh2 = w7;
-        var dneto2_outh1 = w6;
-        var dneto2_outh2 = w8;
+        let dneto1_outh1 = w5;
+        let dneto1_outh2 = w7;
+        let dneto2_outh1 = w6;
+        let dneto2_outh2 = w8;
 
-       	var deo1_outh1 = deo1_neto1 * dneto1_outh1;
-       	var deo2_outh1 = deo2_neto2 * dneto2_outh1;
-       	var deo1_outh2 = deo1_neto1 * dneto1_outh2;
-       	var deo2_outh2 = deo2_neto2 * dneto2_outh2;
+        let deo1_outh1 = deo1_neto1 * dneto1_outh1;
+        let deo2_outh1 = deo2_neto2 * dneto2_outh1;
+        let deo1_outh2 = deo1_neto1 * dneto1_outh2;
+        let deo2_outh2 = deo2_neto2 * dneto2_outh2;
 
         // the output of each hidden layer unit contributes to the output/error
-       	// of every output unit, so we have to add the gradients
-       	var detotal_outh1 = deo1_outh1 + deo2_outh1;
-       	var detotal_outh2 = deo1_outh2 + deo2_outh2;
+        // of every output unit, so we have to add the gradients
+        let detotal_outh1 = deo1_outh1 + deo2_outh1;
+        let detotal_outh2 = deo1_outh2 + deo2_outh2;
 
         // neth1 = w1 * i1 + w3 * i2 + b1;
         // neth2 = w2 * i1 + w4 * i2 + b1;
-        var dneth1_w1 = i1;
-        var dneth1_w2 = i1;
-        var dneth2_w3 = i2;
-        var dneth2_w4 = i2;
+        let dneth1_w1 = i1;
+        let dneth1_w2 = i1;
+        let dneth2_w3 = i2;
+        let dneth2_w4 = i2;
 
-        var douth1_neth1 = outh1 * (1 - outh1);
-        var douth2_neth2 = outh2 * (1 - outh2);
+        let douth1_neth1 = outh1 * (1.0 - outh1);
+        let douth2_neth2 = outh2 * (1.0 - outh2);
 
         // new weights 1-4
-        var new_w1 = w1 - lr * dneth1_w1 * douth1_neth1 * detotal_outh1;
-        var new_w2 = w2 - lr * dneth1_w2 * douth2_neth2 * detotal_outh2;
-        var new_w3 = w3 - lr * dneth2_w3 * douth1_neth1 * detotal_outh1;
-        var new_w4 = w4 - lr * dneth2_w4 * douth2_neth2 * detotal_outh2;
+        let new_w1 = w1 - lr * dneth1_w1 * douth1_neth1 * detotal_outh1;
+        let new_w2 = w2 - lr * dneth1_w2 * douth2_neth2 * detotal_outh2;
+        let new_w3 = w3 - lr * dneth2_w3 * douth1_neth1 * detotal_outh1;
+        let new_w4 = w4 - lr * dneth2_w4 * douth2_neth2 * detotal_outh2;
 
         // update weights
         w5 = new_w5;
@@ -351,18 +364,23 @@
         w3 = new_w3;
         w4 = new_w4;
 
-
-        info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${detotal_outo1} \ndeo2_outo2: ${detotal_outo2}  \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}\n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
-
-        updateView();
+        if (!inLoop) {
+            info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${detotal_outo1} \ndeo2_outo2: ${detotal_outo2}  \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}\n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
+            updateView();
+        }
     };
 
     var loop = function (iterations) {
-        forward();
-        for (let i = 0; i < iterations; i++) {
-            backward();
-            forward();
+        forward(false);
+
+        for (let i = 0; i < iterations - 1; i++) {
+            backward(true);
+            forward(true);
         }
+
+        backward(false);
+        forward(false);
+
     };
 
     var updateView = function () {
@@ -386,13 +404,12 @@
     };
 
     var inputs = document.getElementsByTagName('input');
-    for (var i = 0; i < inputs.length; i++) {
+    for (let i = 0; i < inputs.length; i++) {
         inputs[i].onkeyup = forward;
     }
 
 
-    forward();
-    updateView();
+    forward(false);
 
 </script>
 
