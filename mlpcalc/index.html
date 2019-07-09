@@ -182,8 +182,6 @@
 <script>
     "use strict";
 
-    var iterations = 0;
-
     var input1 = document.getElementById("input1");
     var input2 = document.getElementById("input2");
     var loss1 = document.getElementById("loss1");
@@ -219,7 +217,7 @@
 
     var lr = parseFloat(lrate.value);
 
-    
+
     var sigmoid = function (x) {
         return 1.0 / (1.0 + Math.exp(-x))
     };
@@ -265,14 +263,13 @@
         etotal = e1 + e2;
 
         if (!inLoop) {
-            info1.innerText = `iterations: ${iterations}\ni1: ${i1} \ni2: ${i2} \ntarget1: ${y1} \ntarget2: ${y2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nb1: ${b1} \nb2: ${b2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne1: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
+            info1.innerText = `i1: ${i1} \ni2: ${i2} \ntarget1: ${y1} \ntarget2: ${y2} \nw1: ${w1} \nw2: ${w2} \nw3: ${w3} \nw4: ${w4} \nw5: ${w5} \nw6: ${w6} \nw7: ${w7} \nw8: ${w8} \nb1: ${b1} \nb2: ${b2} \nneth1: ${neth1} \nneth2: ${neth2} \nouth1: ${outh1} \nouth2: ${outh2} \nneto1: ${neto1} \nneto2: ${neto2} \nouto1: ${outo1} \nouto2: ${outo2} \ne1: ${e1} \ne2: ${e2} \netotal: ${etotal} \n`;
             updateView();
         }
 
     };
 
     var backward = function (inLoop) {
-        iterations++;
 
         if (!inLoop) {
             lr = parseFloat(lrate.value);
@@ -365,7 +362,7 @@
         w4 = new_w4;
 
         if (!inLoop) {
-            info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndeo1_outo1: ${detotal_outo1} \ndeo2_outo2: ${detotal_outo2}  \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2}\n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
+            info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2} \ndetotal_outh1: ${detotal_outh1} \ndetotal_outh2: ${detotal_outh2} \n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
             updateView();
         }
     };
