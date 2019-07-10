@@ -402,7 +402,9 @@
 
     var inputs = document.getElementsByTagName('input');
     for (let i = 0; i < inputs.length; i++) {
-        inputs[i].onkeyup = forward;
+        inputs[i].onkeyup = function () {
+            forward(false)
+        };
     }
 
 
