@@ -153,11 +153,11 @@
 
     <div id="bias1">
         <label for="b1">Bias 1</label><input type="text" id="b1" value="0.35">
-        Backprop<input type="checkbox" name="bias" value="0" disabled>
+        Backprop<input type="checkbox" name="bias" id="backprop_b1" value="0"/>
     </div>
     <div id="bias2">
         <label for="b2">Bias 2</label><input type="text" id="b2" value="0.6">
-        Backprop<input type="checkbox" name="bias" value="0" disabled>
+        Backprop<input type="checkbox" name="bias" id="backprop_b2" value="0"/>
     </div>
 
 </div>
@@ -207,6 +207,9 @@
 
     var vtarget1 = document.getElementById("target1");
     var vtarget2 = document.getElementById("target2");
+
+    var backprop_b1 = document.getElementById("backprop_b1");
+    var backprop_b2 = document.getElementById("backprop_b2");
 
 
     var info1 = document.getElementById("info1");
@@ -291,18 +294,22 @@
         let dneto2_w6 = outh1;
         let dneto1_w7 = outh2;
         let dneto2_w8 = outh2;
+        let dneto1_b2 = 1.0;
+        let dneto2_b2 = 1.0;
 
         // chaining gradients to get derivatives of total error with respect to weights 5-8
         let detotal_w5 = detotal_outo1 * douto1_neto1 * dneto1_w5;
         let detotal_w6 = detotal_outo2 * douto2_neto2 * dneto2_w6;
         let detotal_w7 = detotal_outo1 * douto1_neto1 * dneto1_w7;
         let detotal_w8 = detotal_outo2 * douto2_neto2 * dneto2_w8;
+        let detotal_b2 = detotal_outo1 * douto1_neto1 * dneto1_b2 + detotal_outo2 * douto2_neto2 * dneto2_b2;
 
-        // new weights 5-8
+        // new weights 5-8, bias 2
         let new_w5 = w5 - lr * detotal_w5;
         let new_w6 = w6 - lr * detotal_w6;
         let new_w7 = w7 - lr * detotal_w7;
         let new_w8 = w8 - lr * detotal_w8;
+        let new_b2 = b2 - lr * detotal_b2;
 
 
         // backprop into hidden layer
@@ -334,12 +341,15 @@
         let detotal_outh1 = deo1_outh1 + deo2_outh1;
         let detotal_outh2 = deo1_outh2 + deo2_outh2;
 
+
         // neth1 = w1 * i1 + w3 * i2 + b1;
         // neth2 = w2 * i1 + w4 * i2 + b1;
         let dneth1_w1 = i1;
         let dneth1_w2 = i1;
         let dneth2_w3 = i2;
         let dneth2_w4 = i2;
+        let dneth1_b1 = 1.0;
+        let dneth2_b1 = 1.0;
 
         let douth1_neth1 = outh1 * (1.0 - outh1);
         let douth2_neth2 = outh2 * (1.0 - outh2);
@@ -349,6 +359,7 @@
         let new_w2 = w2 - lr * dneth1_w2 * douth2_neth2 * detotal_outh2;
         let new_w3 = w3 - lr * dneth2_w3 * douth1_neth1 * detotal_outh1;
         let new_w4 = w4 - lr * dneth2_w4 * douth2_neth2 * detotal_outh2;
+        let new_b1 = b1 - lr * (dneth1_b1 * douth1_neth1 * detotal_outh1 + dneth2_b1 * douth2_neth2 * detotal_outh2);
 
         // update weights
         w5 = new_w5;
@@ -360,6 +371,13 @@
         w2 = new_w2;
         w3 = new_w3;
         w4 = new_w4;
+
+        if (backprop_b1.checked) {
+            b1 = new_b1;
+        }
+        if (backprop_b2.checked) {
+            b2 = new_b2;
+        }
 
         if (!inLoop) {
             info2.innerText = `detotal_outo1: ${detotal_outo1} \ndetotal_outo2: ${detotal_outo2} \ndneto1_w5: ${dneto1_w5} \ndneto2_w6: ${dneto2_w6} \ndneto1_w7: ${dneto1_w7} \ndneto2_w8: ${dneto2_w8} \ndetotal_w5: ${detotal_w5}\ndetotal_w6: ${detotal_w6}\ndetotal_w7: ${detotal_w7}\ndetotal_w8: ${detotal_w8}\ndneto1_outh1: ${dneto1_outh1}\ndneto1_outh2: ${dneto1_outh2}\ndneto2_outh1: ${dneto2_outh1}\ndneto2_outh2: ${dneto2_outh2} \ndetotal_outh1: ${detotal_outh1} \ndetotal_outh2: ${detotal_outh2} \n\nnew w1: ${new_w1}\nnew w2: ${new_w2}\nnew w3: ${new_w3}\nnew w4: ${new_w4}\nnew w5: ${new_w5}\nnew w6: ${new_w6}\nnew w7: ${new_w7}\nnew w8: ${new_w8}`;
@@ -390,6 +408,9 @@
         vw6.value = w6;
         vw7.value = w7;
         vw8.value = w8;
+
+        vb1.value = b1;
+        vb2.value = b2;
 
         o1out.innerText = `outo1 ${outo1.toFixed(4)}`;
         o2out.innerText = `outo2 ${outo2.toFixed(4)}`;
