@@ -19,7 +19,7 @@
 
     This map is based on open data. The earth map is based on a download from
     <a href="http://earthobservatory.nasa.gov/">the Nasa Earth observatory</a>. COVID-19 data
-    downloaded from <a href="https://github.com/CSSEGISandData">github.com/CSSEGISandData</a> provided by
+    downloaded from <a href="https://github.com/CSSEGISandData/COVID-19">https://github.com/CSSEGISandData/COVID-19</a> provided by
     <a href="https://systems.jhu.edu/">CSSE at Johns Hopkins University</a>.
 </div>
 <div id="globe"></div>
@@ -70,11 +70,9 @@
         var cubeMat = new THREE.MeshLambertMaterial({color: 0x000000, opacity: 0.6, emissive: 0xffffff});
         for (var i = 1; i < data.length - 1; i++) {
 
-            //get the data, and set the offset, we need to do this since the x,y coordinates
-            //from the data aren't in the correct format
-            var x = parseInt(data[i][6])  //+180;
-            var y = parseInt((data[i][5])) //-84) *-1;
-            var value = parseFloat(data[i][7]) / 4;
+            var x = parseInt(data[i][6]) 
+            var y = parseInt((data[i][5]))
+            var value = parseFloat(data[i][8]);
 
             // calculate the position where we need to start the cube
             var position = latLongToVector3(y, x, 600, 2);
