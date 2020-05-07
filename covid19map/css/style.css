@@ -1,21 +1,24 @@
 body {
     background-color: #111;
-
 }
 
 .explanation {
-    font-family: verdana;
+    font-family: verdana, serif;
     color: #CCC;
     margin-left: auto;
     margin-right: auto;
-    width: 900px;
+    width: 100%;
     margin-bottom: 5px;
     font-size: x-small;
-    padding-bottom: 5px;
+    position: absolute;
+    top: 36px;
 }
 
 .page-header {
-    font-family: helvetica;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    font-family: helvetica, serif;
     font-weight: lighter;
     color: #CCCCCC;
     font-style: normal;
@@ -30,11 +33,11 @@ body {
 
 html {
     background-color: #111;
+    overflow: hidden;
 }
 
 .explanation a {
-    color: #6495ed;
-
+    color: #6495ed
 }
 
 #globe {
@@ -42,8 +45,4 @@ html {
     margin-right: auto;
     width: 1000px;
     height: 600px;
-}
-
-div {
-    background-color: #111;
 }

@@ -4,6 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Global COVID-19 Deaths May 6th, 2020</title>
     <script type="text/javascript" src="js/three.js"></script>
+    <script type="text/javascript" src="js/OrbitControls.js"></script>
     <link type="text/css" href="css/style.css" rel="stylesheet">
 </head>
 <body>
@@ -11,7 +12,7 @@
     Global COVID-19 Deaths May 6th, 2020
 </h1>
 <div class="explanation">
-    This page shows COVID-19 deaths throughout the world in May 6th, 2020. The height of the column represents
+    This page shows COVID-19 deaths throughout the world at May 6th, 2020. The height of the column represents
     the deaths in that specific area. This project has been inspired by the <a
         href="http://www.smartjava.org/content/html5-render-open-data-3d-world-globe-threejs/">World Population
     Density</a> visualization by Jos Dirksen. To view this page you need to have a browser that
@@ -19,7 +20,7 @@
 
     This map is based on open data. The earth map is based on a download from
     <a href="http://earthobservatory.nasa.gov/">the Nasa Earth observatory</a>. COVID-19 data
-    downloaded from <a href="https://github.com/CSSEGISandData/COVID-19">https://github.com/CSSEGISandData/COVID-19</a> provided by
+    downloaded from <a href="https://github.com/CSSEGISandData">github.com/CSSEGISandData</a> provided by
     <a href="https://systems.jhu.edu/">CSSE at Johns Hopkins University</a>.
 </div>
 <div id="globe"></div>
@@ -28,22 +29,22 @@
 
     const url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-06-2020.csv';
 
-    // couple of constants
+    // camera position and renderer size
     var POS_X = 1800;
-    var POS_Y = 500;
+    var POS_Y = 900;
     var POS_Z = 1800;
-    var WIDTH = 1000;
-    var HEIGHT = 600;
+    var WIDTH = window.innerWidth;
+    var HEIGHT = window.innerHeight;
 
-    var FOV = 45;
+    var FOV = 50;
     var NEAR = 1;
-    var FAR = 4000;
+    var FAR = 2800;
 
     // some global variables and initialization code
     // simple basic renderer
     var renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
     renderer.setSize(WIDTH, HEIGHT);
-    renderer.setClearColorHex(0x111111);
+    renderer.setClearColorHex(0x111111, 1);
 
     // add it to the target element
     var mapDiv = document.getElementById("globe");
@@ -58,10 +59,8 @@
     var scene = new THREE.Scene();
     scene.add(camera);
 
-
-    // simple function that converts the density data to the markers on screen
-    // the height of each marker is relative to the density.
-    function addDensity(data) {
+    // simple function that converts data to the markers on screen
+    function addData(data) {
 
         // the geometry that will contain all our cubes
         var geom = new THREE.Geometry();
@@ -70,9 +69,9 @@
         var cubeMat = new THREE.MeshLambertMaterial({color: 0x000000, opacity: 0.6, emissive: 0xffffff});
         for (var i = 1; i < data.length - 1; i++) {
 
-            var x = parseInt(data[i][6]) 
+            var x = parseInt(data[i][6]);
             var y = parseInt((data[i][5]))
-            var value = parseFloat(data[i][8]);
+            var value = parseFloat(data[i][8]) / 3;
 
             // calculate the position where we need to start the cube
             var position = latLongToVector3(y, x, 600, 2);
@@ -246,7 +245,7 @@
     fetch(url)
         .then(response => response.text())
         .then((data) => {
-            addDensity(CSVToArray(data));
+            addData(CSVToArray(data));
             addLights();
             addEarth();
             addClouds();
