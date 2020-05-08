@@ -43,6 +43,6 @@ html {
 #globe {
     margin-left: auto;
     margin-right: auto;
-    width: 1000px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
 }
