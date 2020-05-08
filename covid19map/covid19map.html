@@ -2,16 +2,16 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Global COVID-19 Deaths May 6th, 2020</title>
+    <title>Global COVID-19 Deaths 2020</title>
     <script type="text/javascript" src="js/three.js"></script>
     <link type="text/css" href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<h1 class="page-header">
-    Global COVID-19 Deaths May 6th, 2020
+<h1 class="page-header" id="hl">
+    Global COVID-19 Deaths
 </h1>
 <div class="explanation">
-    This page shows COVID-19 deaths throughout the world at May 6th, 2020. The height of the column represents
+    This page shows COVID-19 deaths throughout the world. The height of the column represents
     the deaths in that specific area. This project has been inspired by the <a
         href="http://www.smartjava.org/content/html5-render-open-data-3d-world-globe-threejs/">World Population
     Density</a> visualization by Jos Dirksen. To view this page you need to have a browser that
@@ -21,6 +21,7 @@
     <a href="http://earthobservatory.nasa.gov/">the Nasa Earth observatory</a>. COVID-19 data
     downloaded from <a href="https://github.com/CSSEGISandData">github.com/CSSEGISandData</a> provided by
     <a href="https://systems.jhu.edu/">CSSE at Johns Hopkins University</a>.
+
 </div>
 <div id="globe"></div>
 
@@ -241,15 +242,48 @@
     }
 
 
-    fetch(url)
-        .then(response => response.text())
+    const git_url = "https://api.github.com/repositories/238316428/contents/csse_covid_19_data/csse_covid_19_daily_reports";
+    const dl_base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+    var dates = []
+
+    fetch(git_url)
+        .then(response => response.json())
         .then((data) => {
-            addData(CSVToArray(data));
-            addLights();
-            addEarth();
-            addClouds();
-            render();
+            for (const e of data) {
+                let n = e["name"];
+
+                if (n.substr(n.length - 4, n.length) !== ".csv") continue;
+
+                let d = n.substr(0, n.length - 4);
+
+                dates.push(d)
+            }
+
+            dates.sort();
+            let last_data = dates[dates.length - 1];
+
+            init(last_data);
         });
+
+    function init(day) {
+        fetch(dl_base_url + day + ".csv")
+            .then(response => response.text())
+            .then((data) => {
+                addData(CSVToArray(data));
+                addLights();
+                addEarth();
+                addClouds();
+                render();
+
+                document.getElementById("hl").innerText = "Global COVID-19 Deaths " + day.replace(/-/g, "/");
+            });
+    }
+
+    function showDate(selectObject) {
+        let date = selectObject.options[selectObject.selectedIndex].text;
+
+        init(date);
+    }
 
 </script>
 
