@@ -56,6 +56,18 @@
     // create a basic scene and add the camera
     var scene = new THREE.Scene();
     scene.add(camera);
+    
+    // handle window resize
+    // https://github.com/mrdoob/three.js/issues/69
+    window.addEventListener('resize', onWindowResize, false);
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
     // simple function that converts data to the markers on screen
     function addData(data) {
