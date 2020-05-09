@@ -67,8 +67,8 @@ function addData(data) {
         let y = parseInt((data[i][5]))
 
         //let confirmed = parseFloat(data[i][7]);
-        let deaths = parseFloat(data[i][8]) / 3;
-        let active = parseFloat(data[i][9]) / 3;
+        let deaths = parseFloat(data[i][8]) / 4;
+        let active = parseFloat(data[i][9]) / 4;
 
         // calculate the position where we need to start the cube
         let position = latLongToVector3(y, x, 600, 2);
@@ -263,7 +263,7 @@ function init(day) {
             addClouds();
             render();
 
-            document.getElementById("hl").innerText = "Global COVID-19 Active Cases and Cumulative Deaths " + day.replace(/-/g, "/");
+            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + day.replace(/-/g, "/");
         });
 }
 
