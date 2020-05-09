@@ -16,7 +16,7 @@ body {
 
 .page-header {
     position: absolute;
-    top: 0px;
+    top: 0;
     width: 100%;
     font-family: helvetica, serif;
     font-weight: lighter;
@@ -24,7 +24,7 @@ body {
     font-style: normal;
     text-align: center;
     font-size: xx-large;
-    margin: 0px;
+    margin: 0;
 }
 
 .explanation p a {
