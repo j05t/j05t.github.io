@@ -68,7 +68,7 @@ function addData(data) {
 
         //let confirmed = parseFloat(data[i][7]);
         let deaths = parseFloat(data[i][8]) / 4;
-        let active = parseFloat(data[i][9]) / 4;
+        let active = parseFloat(data[i][10]) / 4;
 
         // calculate the position where we need to start the cube
         let position = latLongToVector3(y, x, 600, 2);
