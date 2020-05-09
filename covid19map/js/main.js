@@ -263,7 +263,7 @@ function init(day) {
             addClouds();
             render();
 
-            document.getElementById("hl").innerText = "Global COVID-19 Active Cases and Deaths " + day.replace(/-/g, "/");
+            document.getElementById("hl").innerText = "Global COVID-19 Active Cases and Cumulative Deaths " + day.replace(/-/g, "/");
         });
 }
 
