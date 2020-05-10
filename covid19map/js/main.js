@@ -232,6 +232,8 @@ fetch(git_url)
     .then((data) => {
         let select = document.getElementById("show_date");
 
+        select.children[0].remove();
+
         for (const e of data) {
             let n = e["name"];
 
