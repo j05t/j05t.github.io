@@ -1,5 +1,7 @@
 "use strict"
 
+const query = window.location.search.substring(1).split("=")[1];
+
 // camera position and renderer size
 const POS_X = 1800;
 const POS_Y = 900;
@@ -43,7 +45,7 @@ window.addEventListener('resize', function () {
 function addCube(geom, material, value, position, width) {
     if (value < 0) return;
 
-    let cube = new THREE.Mesh(new THREE.CubeGeometry(width, width, 1 + value / 8, 1, 1, 1, material));
+    let cube = new THREE.Mesh(new THREE.CubeGeometry(width, width, 1 + value / 128, 1, 1, 1, material));
     cube.position = position;
     cube.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -67,8 +69,8 @@ function addData(data) {
         let y = parseInt((data[i][5]))
 
         //let confirmed = parseFloat(data[i][7]);
-        let deaths = parseFloat(data[i][8]) / 4;
-        let active = parseFloat(data[i][10]) / 4;
+        let deaths = parseFloat(data[i][8]);
+        let active = parseFloat(data[i][10]);
 
         // calculate the position where we need to start the cube
         let position = latLongToVector3(y, x, 600, 2);
@@ -228,29 +230,44 @@ const dates = []
 fetch(git_url)
     .then(response => response.json())
     .then((data) => {
-        //let select = document.getElementById("show_date");
+        let select = document.getElementById("show_date");
 
         for (const e of data) {
             let n = e["name"];
 
             if (n.substr(n.length - 4, n.length) !== ".csv") continue;
 
-            let d = n.substr(0, n.length - 4);
+            let date = n.substr(0, n.length - 4);
 
-            dates.push(d)
+            let month = parseInt(n.substr(0, 2));
 
-            /*
-            let el = document.createElement("option");
-            el.textContent = d;
-            el.value = d;
-            select.appendChild(el);
-             */
+            if (month >= 4) {
+                dates.push(date);
+
+                let el = document.createElement("option");
+                el.textContent = date;
+                el.value = date;
+                if (date === query) el.selected = true;
+                select.appendChild(el);
+            }
         }
 
-        dates.sort();
-        let day = dates[dates.length - 1];
+        //dates.sort();
 
-        init(day);
+        let last_day = dates[dates.length - 1];
+
+        if (typeof (query) !== "undefined" && query.match(/\d\d-\d\d-\d\d\d\d/) != null) {
+
+            let month = query.substr(0, 2);
+
+            if (month >= 4 && dates.includes(query)) {
+                init(query);
+            } else {
+                init(last_day);
+            }
+        } else {
+            init(last_day);
+        }
     });
 
 function init(day) {
@@ -267,10 +284,10 @@ function init(day) {
         });
 }
 
-/*
+
 function showDate(selectObject) {
     let date = selectObject.options[selectObject.selectedIndex].text;
-
-    init(date);
+    let baseUrl = window.location.origin + window.location.pathname;
+    window.location = baseUrl + "?date=" + date;
 }
-*/
+
