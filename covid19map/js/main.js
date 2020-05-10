@@ -245,18 +245,20 @@ fetch(git_url)
 
             if (month >= 4) {
                 dates.push(date);
-
-                let el = document.createElement("option");
-                el.textContent = date;
-                el.value = date;
-                if (date === query) el.selected = true;
-                select.appendChild(el);
             }
         }
 
-        //dates.sort();
+        dates.sort().reverse();
 
-        let last_day = dates[dates.length - 1];
+        for (const date of dates) {
+            let el = document.createElement("option");
+            el.textContent = date;
+            el.value = date;
+            if (date === query) el.selected = true;
+            select.appendChild(el);
+        }
+
+        let last_day = dates[0];
 
         if (typeof (query) !== "undefined" && query.match(/\d\d-\d\d-\d\d\d\d/) != null) {
 
