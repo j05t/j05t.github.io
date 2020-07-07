@@ -2,6 +2,10 @@
 
 const query = window.location.search.substring(1).split("=")[1];
 
+const git_url = "https://api.github.com/repositories/238316428/contents/csse_covid_19_data/csse_covid_19_daily_reports";
+const dl_base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+const dates = []
+
 // camera position and renderer size
 const POS_X = 1800;
 const POS_Y = 900;
@@ -65,12 +69,11 @@ function addData(data) {
 
     for (let i = 1; i < data.length - 1; i++) {
 
-        let x = parseInt(data[i][6]);
-        let y = parseInt((data[i][5]))
+        let x = parseInt(data[i][0]);
+        let y = parseInt((data[i][1]))
 
-        //let confirmed = parseFloat(data[i][7]);
-        let deaths = parseFloat(data[i][8]);
-        let active = parseFloat(data[i][10]);
+        let deaths = parseFloat(data[i][2]);
+        let active = parseFloat(data[i][3]);
 
         // calculate the position where we need to start the cube
         let position = latLongToVector3(y, x, 600, 2);
@@ -148,84 +151,22 @@ function render() {
     requestAnimationFrame(render);
 }
 
-// from http://stackoverflow.com/questions/1293147/javascript-code-to-parse-csv-data
+
 function CSVToArray(strData, strDelimiter) {
-    // Check to see if the delimiter is defined. If not,
-    // then default to comma.
+
+    let arrData = [];
+
     strDelimiter = (strDelimiter || ",");
 
-    // Create a regular expression to parse the CSV values.
-    const objPattern = new RegExp(
-        (
-            // Delimiters.
-            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+    const rows = strData.slice(strData.indexOf('\n') + 1).split('\n');
 
-            // Quoted fields.
-            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+    rows.forEach(function (row) {
+        let s = row.split(strDelimiter);
+        arrData.push([s[6], s[5], s[8], s[10]]);
+    });
 
-            // Standard fields.
-            "([^\"\\" + strDelimiter + "\\r\\n]*))"
-        ),
-        "gi"
-    );
-
-    // Create an array to hold our data. Give the array
-    // a default empty first row.
-    let arrData = [[]];
-
-    // Create an array to hold our individual pattern
-    // matching groups.
-    let arrMatches = null;
-
-    // Keep looping over the regular expression matches
-    // until we can no longer find a match.
-    while (arrMatches = objPattern.exec(strData)) {
-
-        // Get the delimiter that was found.
-        let strMatchedDelimiter = arrMatches[1];
-
-        // Check to see if the given delimiter has a length
-        // (is not the start of string) and if it matches
-        // field delimiter. If id does not, then we know
-        // that this delimiter is a row delimiter.
-        if (
-            strMatchedDelimiter.length &&
-            (strMatchedDelimiter !== strDelimiter)
-        ) {
-            // Since we have reached a new row of data,
-            // add an empty row to our data array.
-            arrData.push([]);
-        }
-
-        // Now that we have our delimiter out of the way,
-        // let's check to see which kind of value we
-        // captured (quoted or unquoted).
-        let strMatchedValue;
-        if (arrMatches[2]) {
-            // We found a quoted value. When we capture
-            // this value, unescape any double quotes.
-            strMatchedValue = arrMatches[2].replace(
-                new RegExp("\"\"", "g"),
-                "\""
-            );
-
-        } else {
-            // We found a non-quoted value.
-            strMatchedValue = arrMatches[3];
-        }
-
-        // Now that we have our value string, let's add
-        // it to the data array.
-        arrData[arrData.length - 1].push(strMatchedValue);
-    }
-
-    // Return the parsed data.
-    return (arrData);
+    return arrData;
 }
-
-const git_url = "https://api.github.com/repositories/238316428/contents/csse_covid_19_data/csse_covid_19_daily_reports";
-const dl_base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
-const dates = []
 
 fetch(git_url)
     .then(response => response.json())
