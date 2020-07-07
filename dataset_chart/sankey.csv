@@ -1,0 +1,43 @@
+"source","target","value"
+"ISIC-2019","MEL",4522
+"ISIC-2019","NV",12875
+"ISIC-2019","BCC",3323
+"ISIC-2019","AK",867
+"ISIC-2019","BKL",2624
+"ISIC-2019","DF",239
+"ISIC-2019","VASC",253
+"ISIC-2019","SCC",628
+"SD-198","UNK",5944
+"MED-NODE","MEL",70
+"MED-NODE","NV",100
+"7-point criteria database","MEL",252
+"7-point criteria database","NV",569
+"7-point criteria database","BCC",42
+"7-point criteria database","BKL",85
+"7-point criteria database","DF",20
+"7-point criteria database","VASC",29
+"7-point criteria database","UNK",14
+"PH2","MEL",40
+"PH2","NV",160
+"SKINL2","MEL",20
+"SKINL2","DF",35
+"SKINL2","BCC",13
+"SKINL2","BKL",24
+"MEL","Train",4413
+"NV","Train",12333
+"BCC","Train",3040
+"AK","Train",780
+"BKL","Train",2459
+"DF","Train",264
+"VASC","Train",253
+"SCC","Train",565
+"UNK","Train",5362
+"MEL","Valid",491
+"NV","Valid",1371
+"BCC","Valid",338
+"AK","Valid",87
+"BKL","Valid",274
+"DF","Valid",30
+"VASC","Valid",29
+"SCC","Valid",63
+"UNK","Valid",596
