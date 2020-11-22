@@ -13,7 +13,7 @@ const POS_Z = 1800;
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
-const FOV = 50;
+const FOV = 55;
 const NEAR = 1;
 const FAR = 2800;
 
@@ -236,3 +236,17 @@ function showDate(selectObject) {
     window.location = baseUrl + "?date=" + date;
 }
 
+var toggleDescription = document.getElementById('toggleDescription');
+
+var toggleText = function () {
+    let x = document.getElementById("description");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+      toggleDescription.innerText = "Hide description"
+    } else {
+      x.style.display = "none";
+      toggleDescription.innerText = "Show description"
+    }
+} 
+
+toggleDescription.onclick = toggleText;
