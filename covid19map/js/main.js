@@ -229,7 +229,7 @@ function init(date) {
             addClouds();
             render();
 
-            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
+            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths "; // + date;
         });
 }
 
