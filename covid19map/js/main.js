@@ -202,11 +202,11 @@ fetch(git_url)
         }
 
         if (typeof (query) !== "undefined" && query.match(/\d\d\d\d-\d\d-\d\d/) != null) {
+            let month = parseInt(query.substr(5, 2));
+    	    let year = parseInt(query.substr(0, 4));
 
-            let month = query.substr(5, 2);
-
-            if (month >= 4 && dates.includes(query)) {
-                init(query);
+            if (month >= 4 || year > 2020) {           
+		        init(query);
             } else {
                 init(dates[0].toISOString().substring(0, 10));
             }
@@ -228,8 +228,8 @@ function init(date) {
             addEarth();
             addClouds();
             render();
-
-            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths "; // + date;
+    	    
+	        document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
         });
 }
 
