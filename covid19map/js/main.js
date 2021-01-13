@@ -180,43 +180,47 @@ fetch(git_url)
 
             if (n.substr(n.length - 4, n.length) !== ".csv") continue;
 
-            let date = n.substr(0, n.length - 4);
-
+            //let date = n.substr(0, n.length - 4);
+            let day = parseInt(n.substr(3, 4));
             let month = parseInt(n.substr(0, 2));
+            let year = parseInt(n.substr(6, 10));
 
-            if (month >= 4) {
-                dates.push(date);
+            if (month >= 4 || year > 2020) {
+                dates.push(new Date(year, month-1, day)); // the month is 0-indexed
             }
         }
 
-        dates.sort().reverse();
+        dates.sort((a,b)=> b-a);
 
         for (const date of dates) {
+            let dateString = date.toISOString().substring(0, 10);
             let el = document.createElement("option");
-            el.textContent = date;
-            el.value = date;
-            if (date === query) el.selected = true;
+            el.textContent = dateString;
+            el.value = dateString;
+            if (dateString === query) el.selected = true;
             select.appendChild(el);
         }
 
-        let last_day = dates[0];
+        if (typeof (query) !== "undefined" && query.match(/\d\d\d\d-\d\d-\d\d/) != null) {
 
-        if (typeof (query) !== "undefined" && query.match(/\d\d-\d\d-\d\d\d\d/) != null) {
-
-            let month = query.substr(0, 2);
+            let month = query.substr(5, 2);
 
             if (month >= 4 && dates.includes(query)) {
                 init(query);
             } else {
-                init(last_day);
+                init(dates[0].toISOString().substring(0, 10));
             }
         } else {
-            init(last_day);
+            init(dates[0].toISOString().substring(0, 10));
         }
     });
 
-function init(day) {
-    fetch(dl_base_url + day + ".csv")
+function init(date) {
+    let year = date.substr(0, 4);
+    let month = date.substr(5, 2);
+    let day = date.substr(8, 2);
+
+    fetch(dl_base_url + month + "-" + day + "-" + year + ".csv")
         .then(response => response.text())
         .then((data) => {
             addData(CSVToArray(data));
@@ -225,7 +229,7 @@ function init(day) {
             addClouds();
             render();
 
-            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + day.replace(/-/g, "/");
+            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
         });
 }
 
