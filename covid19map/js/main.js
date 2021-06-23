@@ -7,23 +7,22 @@ const dl_base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/m
 const dates = []
 
 // camera position and renderer size
-const POS_X = 1800;
+const POS_X = 1200;
 const POS_Y = 900;
-const POS_Z = 1800;
+const POS_Z = 1200;
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
 const FOV = 55;
 const NEAR = 100;
-const FAR = 6000;
+const FAR = 8000;
 
-const light = new THREE.DirectionalLight(0x3333ee, 3.5, 500);
+const light = new THREE.DirectionalLight(0xcccccc, 2.6, 1800);
 
 // some global variables and initialization code
 // simple basic renderer
-const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+const renderer = new THREE.WebGLRenderer({alpha: false, antialias: true});
 renderer.setSize(WIDTH, HEIGHT);
-renderer.setClearColorHex(0x111111, 1);
 
 // add it to the target element
 document.getElementById("globe").appendChild(renderer.domElement);
@@ -37,19 +36,22 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 const scene = new THREE.Scene();
 scene.add(camera);
 
-var controls = new THREE.OrbitControls (camera, renderer.domElement);
+const controls = new THREE.OrbitControls (camera, renderer.domElement);
 controls.autoRotate = true;
-controls.autoRotateSpeed = 1;
-controls.userZoom = true;
+controls.autoRotateSpeed = 0.6;
+controls.enableZoom = true;
+controls.minZoom = 1;
 
 function zoom(event) {
     event.preventDefault();
 
-    (event.deltaY > 0) ? controls.zoomIn() : controls.zoomOut();
-};
-
+    if (event.deltaY > 0) {
+        controls.zoomIn();
+    } else if (event.deltaY < 0){
+        controls.zoomOut();
+    }
+}
 document.onwheel = zoom;
-
 
 // handle window resize
 // https://github.com/mrdoob/three.js/issues/69
@@ -83,8 +85,8 @@ function addData(data) {
 
     for (let i = 1; i < data.length - 1; i++) {
 
-        let x = parseInt(data[i][0]);
-        let y = parseInt((data[i][1]))
+        let x = data[i][0];
+        let y = data[i][1];
 
         let deaths = parseFloat(data[i][2]);
         let active = parseFloat(data[i][3]);
@@ -92,11 +94,8 @@ function addData(data) {
         // calculate the position where we need to start the cube
         let position = latLongToVector3(y, x, 600, 2);
 
-        addCube(geom, cubeMatDeaths, deaths, position, 5);
-        addCube(geom, cubeMatActive, active, position, 2);
-        //addCube(geom, cubeMatConfirmed, confirmed, position, 2);
-
-        // scene.add(cube);
+        addCube(geom, cubeMatDeaths, deaths, position, 2);
+        addCube(geom, cubeMatActive, active, position, 1);
     }
 
     // create a new mesh, containing all the other meshes.
@@ -115,11 +114,14 @@ function addLights() {
 // add the earth
 function addEarth() {
     let spGeo = new THREE.SphereGeometry(600, 50, 50);
-    let planetTexture = THREE.ImageUtils.loadTexture("img/world-big-2-grey.jpg");
+    let planetTexture = THREE.ImageUtils.loadTexture("img/world.200406.3x5400x2700.jpg");
     let mat2 = new THREE.MeshPhongMaterial({
         map: planetTexture,
         perPixel: false,
-        shininess: 0.2
+        shininess: 0.2,
+        bumpMap: THREE.ImageUtils.loadTexture("img/srtm_ramp2.worldx294x196.jpg"),
+        //displacementMap: THREE.ImageUtils.loadTexture("img/srtm_ramp2.worldx294x196.jpg"),
+        //displacementScale: 2
     });
     let sp = new THREE.Mesh(spGeo, mat2);
     scene.add(sp);
@@ -133,7 +135,7 @@ function addClouds() {
         color: 0xffffff,
         map: cloudsTexture,
         transparent: true,
-        opacity: 0.3
+        opacity: 0.6
     });
 
     let meshClouds = new THREE.Mesh(spGeo, materialClouds);
@@ -155,12 +157,6 @@ function latLongToVector3(lat, lon, radius, height) {
 
 // render the scene
 function render() {
-    /*
-    let timer = Date.now() * 0.0001;
-    camera.position.x = (Math.cos(timer) * 1800);
-    camera.position.z = (Math.sin(timer) * 1800);
-    camera.lookAt(scene.position);
-    */
     controls.update();
     light.position = camera.position;
     light.lookAt(scene.position);
@@ -243,7 +239,7 @@ function init(date) {
             addData(CSVToArray(data));
             addLights();
             addEarth();
-            addClouds();
+            //addClouds();
             render();
     	    
 	        document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
@@ -257,9 +253,9 @@ function showDate(selectObject) {
     window.location = baseUrl + "?date=" + date;
 }
 
-var toggleDescription = document.getElementById('toggleDescription');
+const toggleDescription = document.getElementById('toggleDescription');
 
-var toggleText = function () {
+const toggleText = function () {
     let x = document.getElementById("description");
     if (x.style.display === "none") {
       x.style.display = "block";
