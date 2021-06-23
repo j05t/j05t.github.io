@@ -37,6 +37,20 @@ camera.lookAt(new THREE.Vector3(0, 0, 0));
 const scene = new THREE.Scene();
 scene.add(camera);
 
+var controls = new THREE.OrbitControls (camera, renderer.domElement);
+controls.autoRotate = false;
+controls.autoRotateSpeed = 1;
+controls.userZoom = true;
+
+function zoom(event) {
+    event.preventDefault();
+
+    (event.deltaY > 0) ? controls.zoomIn() : controls.zoomOut();
+};
+
+document.onwheel = zoom;
+
+
 // handle window resize
 // https://github.com/mrdoob/three.js/issues/69
 window.addEventListener('resize', function () {
@@ -141,10 +155,13 @@ function latLongToVector3(lat, lon, radius, height) {
 
 // render the scene
 function render() {
+    /*
     let timer = Date.now() * 0.0001;
     camera.position.x = (Math.cos(timer) * 1800);
     camera.position.z = (Math.sin(timer) * 1800);
     camera.lookAt(scene.position);
+    */
+    controls.update();
     light.position = camera.position;
     light.lookAt(scene.position);
     renderer.render(scene, camera);
