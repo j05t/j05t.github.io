@@ -14,8 +14,8 @@ const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
 const FOV = 55;
-const NEAR = 1;
-const FAR = 2800;
+const NEAR = 100;
+const FAR = 6000;
 
 const light = new THREE.DirectionalLight(0x3333ee, 3.5, 500);
 
@@ -38,7 +38,7 @@ const scene = new THREE.Scene();
 scene.add(camera);
 
 var controls = new THREE.OrbitControls (camera, renderer.domElement);
-controls.autoRotate = false;
+controls.autoRotate = true;
 controls.autoRotateSpeed = 1;
 controls.userZoom = true;
 
