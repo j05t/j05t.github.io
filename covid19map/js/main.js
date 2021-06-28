@@ -253,17 +253,13 @@ function showDate(selectObject) {
     window.location = baseUrl + "?date=" + date;
 }
 
-const toggleDescription = document.getElementById('toggleDescription');
-
-const toggleText = function () {
+document.getElementById('toggleDescription').onclick = function () {
     let x = document.getElementById("description");
     if (x.style.display === "none") {
       x.style.display = "block";
-      toggleDescription.innerText = "Hide description"
+      this.innerText = "Hide description"
     } else {
       x.style.display = "none";
-      toggleDescription.innerText = "Show description"
+      this.innerText = "Show description"
     }
-} 
-
-toggleDescription.onclick = toggleText;
+}
