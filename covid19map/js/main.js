@@ -4,7 +4,6 @@ const query = window.location.search.substring(1).split("=")[1];
 
 const git_url = "https://api.github.com/repositories/238316428/contents/csse_covid_19_data/csse_covid_19_daily_reports";
 const dl_base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
-const dates = []
 
 // camera position and renderer size
 const POS_X = 1200;
@@ -15,7 +14,7 @@ const HEIGHT = window.innerHeight;
 
 const FOV = 55;
 const NEAR = 100;
-const FAR = 8000;
+const FAR = 10000;
 
 const light = new THREE.DirectionalLight(0xcccccc, 2.6, 1800);
 
@@ -164,13 +163,9 @@ function render() {
     requestAnimationFrame(render);
 }
 
-
 function CSVToArray(strData, strDelimiter) {
-
     let arrData = [];
-
-    strDelimiter = (strDelimiter || ",");
-
+    strDelimiter = (strDelimiter || ',');
     const rows = strData.slice(strData.indexOf('\n') + 1).split('\n');
 
     rows.forEach(function (row) {
@@ -185,46 +180,45 @@ fetch(git_url)
     .then(response => response.json())
     .then((data) => {
         let select = document.getElementById("show_date");
+        let dates = [];
 
-        select.children[0].remove();
+        select.children[0].remove(); // loading..
 
         for (const e of data) {
             let n = e["name"];
 
             if (n.substr(n.length - 4, n.length) !== ".csv") continue;
 
-            //let date = n.substr(0, n.length - 4);
             let day = parseInt(n.substr(3, 4));
             let month = parseInt(n.substr(0, 2));
             let year = parseInt(n.substr(6, 10));
 
             if (month >= 4 || year > 2020) {
-                dates.push(new Date(year, month-1, day)); // the month is 0-indexed
+                dates.push(`${year}-${month.toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`);
             }
         }
 
-        dates.sort((a,b)=> b-a);
+        dates.sort().reverse();
 
         for (const date of dates) {
-            let dateString = date.toISOString().substring(0, 10);
             let el = document.createElement("option");
-            el.textContent = dateString;
-            el.value = dateString;
-            if (dateString === query) el.selected = true;
+            el.textContent = date;
+            el.value = date;
+            if (date === query) el.selected = true;
             select.appendChild(el);
         }
 
         if (typeof (query) !== "undefined" && query.match(/\d\d\d\d-\d\d-\d\d/) != null) {
             let month = parseInt(query.substr(5, 2));
-    	    let year = parseInt(query.substr(0, 4));
+            let year = parseInt(query.substr(0, 4));
 
-            if (month >= 4 || year > 2020) {           
-		        init(query);
+            if (month >= 4 || year > 2020) {
+                init(query);
             } else {
-                init(dates[0].toISOString().substring(0, 10));
+                init(dates[0]);
             }
         } else {
-            init(dates[0].toISOString().substring(0, 10));
+            init(dates[0]);
         }
     });
 
@@ -241,11 +235,10 @@ function init(date) {
             addEarth();
             //addClouds();
             render();
-    	    
-	        document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
+
+            document.getElementById("hl").innerText = "COVID-19 Active Cases, Cumulative Deaths " + date;
         });
 }
-
 
 function showDate(selectObject) {
     let date = selectObject.options[selectObject.selectedIndex].text;
@@ -256,10 +249,10 @@ function showDate(selectObject) {
 document.getElementById('toggleDescription').onclick = function () {
     let x = document.getElementById("description");
     if (x.style.display === "none") {
-      x.style.display = "block";
-      this.innerText = "Hide description"
+        x.style.display = "block";
+        this.innerText = "Hide description"
     } else {
-      x.style.display = "none";
-      this.innerText = "Show description"
+        x.style.display = "none";
+        this.innerText = "Show description"
     }
 }
